@@ -1,4 +1,3 @@
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import java.awt.Color;
@@ -12,24 +11,22 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
-
 import java.util.ArrayList;
-import java.util.List;
 
 public class PixelGrid {
-    private JPanel pixelGrid;
+    private JPanel pixelGrid; //the size of the grid component
 
-    private int pixelSize;
-    private int gridWidth;
-    private int gridHeight;
+    private int pixelSize; //size of individual pixel
+    private int gridWidth; //rows
+    private int gridHeight; //columns
     
     private int mouseX = -1;
     private int mouseY = -1;
-    private boolean isMouseHeldDown = false;
+    private boolean isMouseHeldDown = false; //enables drag paint
 
-    private final RenderingHints renderingHints  = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    private final RenderingHints renderingHints  = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //anti-aliasing
 
-    private ArrayList<Rectangle> tiles = new ArrayList<>();
+    private ArrayList<Rectangle> tiles = new ArrayList<>(); //maintains state of the pixels
     private Color tileColor = new Color(0,0,0);
 
     public PixelGrid(int pixelSize, int gridWidth, int gridHeight){
@@ -42,16 +39,16 @@ public class PixelGrid {
     private void createPixelGrid(){
         this.pixelGrid = new JPanel(){
             @Override
-            protected void paintComponent(Graphics g){
+            protected void paintComponent(Graphics g){ //enables painting of tiles
                 super.paintComponent(g);
                 
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHints(renderingHints);
+                Graphics2D g2d = (Graphics2D) g; 
+                g2d.setRenderingHints(renderingHints); //enabling anti-aliasing
                 drawGrid(g2d);
 
-                if (mouseX >= 0 && mouseY >= 0){
+                if (mouseX >= 0 && mouseY >= 0){ //if mouse has been pressed
                     g2d.setColor(tileColor);
-                    for (Rectangle tile : tiles){
+                    for (Rectangle tile : tiles){ //fills the page with all the shaded tiles
                         g2d.fillRect(tile.x, tile.y, tile.width, tile.height);
                     }
                 }
@@ -59,21 +56,21 @@ public class PixelGrid {
         };
         this.pixelGrid.setPreferredSize(new Dimension(this.gridWidth, this.gridHeight));
         this.pixelGrid.addMouseListener(new MouseAdapter(){
-            public void mousePressed(MouseEvent event){
+            public void mousePressed(MouseEvent event){ //listens for mouse press
                 isMouseHeldDown = true;
                 mouseX = (event.getX() / pixelSize) * pixelSize;
                 mouseY = (event.getY() / pixelSize) * pixelSize;
-                tiles.add(new Rectangle(mouseX, mouseY, pixelSize, pixelSize));
-                pixelGrid.repaint();
+                tiles.add(new Rectangle(mouseX, mouseY, pixelSize, pixelSize)); 
+                pixelGrid.repaint(); //updates display
             }
 
-            public void mouseReleased(MouseEvent event){
+            public void mouseReleased(MouseEvent event){ //listens for mouse release
                 isMouseHeldDown = false;
             }
         });
 
-        this.pixelGrid.addMouseMotionListener(new MouseAdapter() {
-            public void mouseDragged(MouseEvent event) {
+        this.pixelGrid.addMouseMotionListener(new MouseAdapter() { //enables mouse drag painting
+            public void mouseDragged(MouseEvent event) { //only valid if pressed
                 if (isMouseHeldDown){
                     mouseX = (event.getX() / pixelSize) * pixelSize;
                     mouseY = (event.getY() / pixelSize) * pixelSize;
@@ -84,7 +81,7 @@ public class PixelGrid {
         });
     }
 
-    private void drawGrid(Graphics2D g2d){
+    private void drawGrid(Graphics2D g2d){ //initial tile grid
         for (int i = 0; i < this.gridWidth; i+=20){
             g2d.drawLine(i, 0, i, this.gridHeight);
         }
