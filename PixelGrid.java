@@ -1,5 +1,4 @@
 import javax.swing.JPanel;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -46,15 +45,17 @@ public class PixelGrid {
                 g2d.setRenderingHints(renderingHints); //enabling anti-aliasing
                 drawGrid(g2d);
 
-                if (mouseX >= 0 && mouseY >= 0){ //if mouse has been pressed
+                g2d.setClip(0,0,gridWidth, gridHeight);
+
+                if ((mouseX >= 0) && (mouseY >= 0)){ //if mouse has been pressed
                     g2d.setColor(tileColor);
                     for (Rectangle tile : tiles){ //fills the page with all the shaded tiles
-                        g2d.fillRect(tile.x, tile.y, tile.width, tile.height);
+                        g2d.fillRect(tile.x, tile.y, tile.width, tile.height); 
                     }
                 }
             }
         };
-        this.pixelGrid.setPreferredSize(new Dimension(this.gridWidth, this.gridHeight));
+        this.pixelGrid.setSize(this.gridHeight, this.gridWidth);
         this.pixelGrid.addMouseListener(new MouseAdapter(){
             public void mousePressed(MouseEvent event){ //listens for mouse press
                 isMouseHeldDown = true;

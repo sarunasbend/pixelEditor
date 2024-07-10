@@ -8,30 +8,20 @@ import java.awt.event.MouseListener;
 import javax.swing.*;
 
 public class GUI extends JFrame{
-    private PixelGrid grid;
+    private DrawingGrid grid;
+    private JPanel pixelGrid;
     private JButton colourSelector;
     private Color currentColor;
     private int red;
     private int green;
     private int blue;
-    
-    public GUI(){
-        setSize(new Dimension(800, 900));
-        grid = new PixelGrid(20, 800, 800);
-        createColourSelector();
-        grid.setTileColor(new Color(255,0 ,0));
-        add(grid.getPanel());
-        //add(colourSelector);
-        pack();
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setResizable(false);
-        setVisible(true);
-    }
 
-    private void createColourSelector(){
-        this.colourSelector = new JButton("COLOUR");
-        this.colourSelector.setBounds(0, 0, 800, 20);
+    public GUI(){
+        setSize(new Dimension(1000, 1000));
+        this.grid = new DrawingGrid(100, 100, 20, 20, 20);
+        this.pixelGrid = this.grid.getDrawingGridPanel();
+        /*this.colourSelector = new JButton("COLOUR");
+        this.colourSelector.setBounds(0, 400, 100, 100);
         this.colourSelector.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event) {
                 currentColor = new Color(red, green, blue);
@@ -40,7 +30,13 @@ public class GUI extends JFrame{
                 blue+=20;
                 grid.setTileColor(currentColor);
             }
-        });
+        });*/
 
+        setLayout(null);
+        //add(colourSelector);
+        add(pixelGrid);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(true);
+        setVisible(true);
     }
 }
