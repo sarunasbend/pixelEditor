@@ -39,7 +39,7 @@ public class Grid {
 
     private final RenderingHints renderingHints  = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //anti-aliasing
 
-    private ArrayList<Pixel> pixels;
+    private Pixel[][] pixels;
     private Color currentColour = new Color(0, 0, 0);
 
     public Grid(int xPanel, int yPanel, int pixelSize, int gridWidth, int gridHeight){
@@ -48,7 +48,7 @@ public class Grid {
         this.pixelSize = pixelSize;
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
-        this.pixels = new ArrayList<>();
+        this.pixels = new Pixel[gridHeight][gridWidth];
         createPixelGrid();
     }
 
@@ -61,11 +61,15 @@ public class Grid {
                 drawGrid(g2d);
                 g2d.setClip(xPanel, yPanel, gridWidth * pixelSize, gridHeight * pixelSize); //might have to change to specify bounds
                 if ((mouseX >= 0) && (mouseY >= 0)){
-                    for (Pixel temp : pixels){
-                        Rectangle pixel = temp.getRectangle();
-                        g2d.setColor(temp.getPixelColour());
-                        g2d.drawRect(pixel.x, pixel.y, pixel.width, pixel.height);
-                        g2d.fillRect(pixel.x, pixel.y, pixel.width, pixel.height);
+                    for (int i = 0; i < gridHeight; i++){
+                        for (int j = 0; j < gridWidth; j++){
+                            if (pixels[i][j] != null){
+                               Rectangle pixel = pixels[i][j].getRectangle();
+                                g2d.setColor(pixels[i][j].getPixelColour());
+                                g2d.drawRect(pixel.x, pixel.y, pixel.width, pixel.height);
+                                g2d.fillRect(pixel.x, pixel.y, pixel.width, pixel.height); 
+                            }  
+                        }
                     }
                 }
             }
@@ -78,8 +82,10 @@ public class Grid {
                 isMouseHeldDown = true;
                 mouseX = ((event.getX() / pixelSize) * pixelSize);
                 mouseY = ((event.getY() / pixelSize) * pixelSize);
-                pixels.add(new Pixel(currentColour, mouseX, mouseY, pixelSize, pixelSize));
-                pixelGrid.repaint();
+                if ((mouseX/pixelSize < gridWidth) && (mouseY/pixelSize < gridHeight) && (mouseX > -1) && (mouseY > -1)){
+                    pixels[mouseX/pixelSize][mouseY/pixelSize] = new Pixel(currentColour, mouseX, mouseY, pixelSize, pixelSize);
+                    pixelGrid.repaint(); 
+                }
             }
             @Override
             public void mouseReleased(MouseEvent event){
@@ -93,8 +99,10 @@ public class Grid {
                 if (isMouseHeldDown){
                     mouseX = ((event.getX() / pixelSize) * pixelSize);
                     mouseY = ((event.getY() / pixelSize) * pixelSize);
-                    pixels.add(new Pixel(currentColour, mouseX, mouseY, pixelSize, pixelSize));
-                    pixelGrid.repaint();
+                    if ((mouseX/pixelSize < gridWidth) && (mouseY/pixelSize < gridHeight) && (mouseX > -1) && (mouseY > -1)){
+                        pixels[mouseX/pixelSize][mouseY/pixelSize] = new Pixel(currentColour, mouseX, mouseY, pixelSize, pixelSize);
+                        pixelGrid.repaint(); 
+                    }
                 }
             }            
         });
