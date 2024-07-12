@@ -182,4 +182,13 @@ public class Grid {
         pixels[(gridHeight - 1) - (mouseX/pixelSize)][mouseY/pixelSize] = new Pixel(currentColour,mouseX, (gridHeight * pixelSize) - mouseY, pixelSize, pixelSize); //
         pixelGrid.repaint();
     }
+
+    public void rotateClockwise(){
+    }
+
+    public void rotateAnticlockwise(){
+    }
+
+    public void undoLastAction(){
+    }
 }
