@@ -42,6 +42,9 @@ public class Grid {
     private Pixel[][] pixels;
     private Color currentColour = new Color(0, 0, 0);
 
+    private boolean xMirror = false;
+    private boolean yMirror = false;
+
     public Grid(int xPanel, int yPanel, int pixelSize, int gridWidth, int gridHeight){
         this.xPanel = xPanel;
         this.yPanel = yPanel;
@@ -59,6 +62,7 @@ public class Grid {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 drawGrid(g2d);
+                g2d.setRenderingHints(renderingHints);
                 g2d.setClip(xPanel, yPanel, gridWidth * pixelSize, gridHeight * pixelSize); //might have to change to specify bounds
                 if ((mouseX >= 0) && (mouseY >= 0)){
                     for (int i = 0; i < gridHeight; i++){
@@ -82,10 +86,29 @@ public class Grid {
                 isMouseHeldDown = true;
                 mouseX = ((event.getX() / pixelSize) * pixelSize);
                 mouseY = ((event.getY() / pixelSize) * pixelSize);
-                if ((mouseX/pixelSize < gridWidth) && (mouseY/pixelSize < gridHeight) && (mouseX > -1) && (mouseY > -1)){
-                    pixels[mouseX/pixelSize][mouseY/pixelSize] = new Pixel(currentColour, mouseX, mouseY, pixelSize, pixelSize);
-                    pixelGrid.repaint(); 
+                if (xMirror && yMirror){
+                    if ((mouseX/pixelSize < gridWidth) && (mouseY/pixelSize < gridHeight) && (mouseX > -1) && (mouseY > -1)){
+                        //adds x and y mirror tiles
+                        paintXYMirror();
+                    }
+                } else if (xMirror && !yMirror){
+                    if ((mouseX/pixelSize < gridWidth) && (mouseY/pixelSize < gridHeight) && (mouseX > -1) && (mouseY > -1)){
+                        //adds x mirror tiles
+                        paintXMirror(); 
+                    }
+                } else if (!xMirror && yMirror){
+                    if ((mouseX/pixelSize < gridWidth) && (mouseY/pixelSize < gridHeight) && (mouseX > -1) && (mouseY > -1)){
+                        //adds y mirror tiles
+                        paintYMirror();
+                    }
+                } else if (!xMirror && !yMirror){
+                    if ((mouseX/pixelSize < gridWidth) && (mouseY/pixelSize < gridHeight) && (mouseX > -1) && (mouseY > -1)){
+                        //adds unmirrored tiles
+                        pixels[mouseX/pixelSize][mouseY/pixelSize] = new Pixel(currentColour, mouseX, mouseY, pixelSize, pixelSize);
+                        pixelGrid.repaint(); 
+                    } 
                 }
+                
             }
             @Override
             public void mouseReleased(MouseEvent event){
@@ -121,4 +144,42 @@ public class Grid {
     public JPanel getGridPanel(){return this.pixelGrid;}
 
     public void setPixelColor(Color pixeColor){this.currentColour = pixeColor;}
+
+    //tools
+    public void clearGrid(){
+        for (int i = 0; i < gridHeight; i++){
+            for (int j = 0; j < gridHeight; j++){
+                pixels[i][j] = null;
+            }
+        }
+        pixelGrid.repaint();
+    }
+
+    public void replaceColour(){
+
+    }
+
+    public void setXMirror(){this.xMirror = !this.xMirror;}
+
+    public void setYMirror(){this.yMirror = !this.yMirror;}
+
+    public void paintXYMirror(){
+        pixels[mouseX/pixelSize][mouseY/pixelSize] = new Pixel(currentColour, mouseX, mouseY, pixelSize, pixelSize); //normal
+        pixels[(gridHeight - 1) - (mouseX/pixelSize)][mouseY/pixelSize] = new Pixel(currentColour,mouseX, (gridHeight * pixelSize) - mouseY, pixelSize, pixelSize); //
+        pixels[mouseX/pixelSize][(gridWidth - 1) - (mouseY/pixelSize)] = new Pixel(currentColour, (gridWidth * pixelSize) - mouseX, mouseY, pixelSize, pixelSize);
+        pixels[(gridHeight - 1) - (mouseX/pixelSize)][(gridWidth - 1) - (mouseY/pixelSize)] = new Pixel(currentColour, (gridWidth * pixelSize) - mouseX, (gridHeight * pixelSize) - mouseY, pixelSize, pixelSize);
+        pixelGrid.repaint(); 
+    }
+
+    public void paintXMirror(){
+        pixels[mouseX/pixelSize][mouseY/pixelSize] = new Pixel(currentColour, mouseX, mouseY, pixelSize, pixelSize); //normal
+        pixels[mouseX/pixelSize][(gridWidth - 1) - (mouseY/pixelSize)] = new Pixel(currentColour, (gridWidth * pixelSize) - mouseX, mouseY, pixelSize, pixelSize);
+        pixelGrid.repaint();
+    }
+
+    public void paintYMirror(){
+        pixels[mouseX/pixelSize][mouseY/pixelSize] = new Pixel(currentColour, mouseX, mouseY, pixelSize, pixelSize); //normal
+        pixels[(gridHeight - 1) - (mouseX/pixelSize)][mouseY/pixelSize] = new Pixel(currentColour,mouseX, (gridHeight * pixelSize) - mouseY, pixelSize, pixelSize); //
+        pixelGrid.repaint();
+    }
 }
