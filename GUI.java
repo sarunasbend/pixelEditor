@@ -1,8 +1,14 @@
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 /** Temporary class for testing the pixel editor functionality
@@ -23,6 +29,8 @@ public class GUI extends JFrame{
 
     private JButton xMirror;
     private JButton yMirror;
+
+    private JButton export;
 
     public GUI(){
         setSize(new Dimension(405, 700));
@@ -84,7 +92,15 @@ public class GUI extends JFrame{
                 grid.setYMirror();
             }            
         });
-        
+
+        this.export = new JButton("EXPORT");
+        this.export.setBounds(50, 500, 50, 50);
+        this.export.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent event){
+                exportGridAsPNG(pixelGrid);
+            }          
+        });
+
 
         setLayout(null);
         add(redButton);
@@ -94,8 +110,24 @@ public class GUI extends JFrame{
         add(clearButton);
         add(xMirror);
         add(yMirror);
+        add(export);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(true);
         setVisible(true);
+    }
+    
+    public void exportGridAsPNG(JPanel panel){
+        BufferedImage image = new BufferedImage(grid.getWidth(), grid.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        
+        
+        Graphics2D g2d = image.createGraphics();
+        this.grid.printAll(g2d);
+
+        try {
+            ImageIO.write(image, "png", new File("exports.png"));
+            System.out.println("Panel saved as PNG");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -55,6 +55,10 @@ public class Grid {
         createPixelGrid();
     }
 
+    public int getWidth(){return this.gridWidth * this.pixelSize;}
+    public int getHeight(){return this.gridHeight * this.pixelSize;}
+    public void printAll(Graphics2D g2d){this.pixelGrid.printAll(g2d);}
+    
     private void createPixelGrid(){
         this.pixelGrid = new JPanel(){
             @Override
@@ -122,9 +126,27 @@ public class Grid {
                 if (isMouseHeldDown){
                     mouseX = ((event.getX() / pixelSize) * pixelSize);
                     mouseY = ((event.getY() / pixelSize) * pixelSize);
-                    if ((mouseX/pixelSize < gridWidth) && (mouseY/pixelSize < gridHeight) && (mouseX > -1) && (mouseY > -1)){
-                        pixels[mouseX/pixelSize][mouseY/pixelSize] = new Pixel(currentColour, mouseX, mouseY, pixelSize, pixelSize);
-                        pixelGrid.repaint(); 
+                    if (xMirror && yMirror){
+                        if ((mouseX/pixelSize < gridWidth) && (mouseY/pixelSize < gridHeight) && (mouseX > -1) && (mouseY > -1)){
+                            //adds x and y mirror tiles
+                            paintXYMirror();
+                        }
+                    } else if (xMirror && !yMirror){
+                        if ((mouseX/pixelSize < gridWidth) && (mouseY/pixelSize < gridHeight) && (mouseX > -1) && (mouseY > -1)){
+                            //adds x mirror tiles
+                            paintXMirror(); 
+                        }
+                    } else if (!xMirror && yMirror){
+                        if ((mouseX/pixelSize < gridWidth) && (mouseY/pixelSize < gridHeight) && (mouseX > -1) && (mouseY > -1)){
+                            //adds y mirror tiles
+                            paintYMirror();
+                        }
+                    } else if (!xMirror && !yMirror){
+                        if ((mouseX/pixelSize < gridWidth) && (mouseY/pixelSize < gridHeight) && (mouseX > -1) && (mouseY > -1)){
+                            //adds unmirrored tiles
+                            pixels[mouseX/pixelSize][mouseY/pixelSize] = new Pixel(currentColour, mouseX, mouseY, pixelSize, pixelSize);
+                            pixelGrid.repaint(); 
+                        } 
                     }
                 }
             }            
@@ -165,7 +187,7 @@ public class Grid {
 
     public void paintXYMirror(){
         pixels[mouseX/pixelSize][mouseY/pixelSize] = new Pixel(currentColour, mouseX, mouseY, pixelSize, pixelSize); //normal
-        pixels[(gridHeight - 1) - (mouseX/pixelSize)][mouseY/pixelSize] = new Pixel(currentColour,mouseX, (gridHeight * pixelSize) - mouseY, pixelSize, pixelSize); //
+        pixels[(gridHeight - 1) - (mouseX/pixelSize)][mouseY/pixelSize] = new Pixel(currentColour,mouseX, (gridHeight * pixelSize) - mouseY, pixelSize, pixelSize); 
         pixels[mouseX/pixelSize][(gridWidth - 1) - (mouseY/pixelSize)] = new Pixel(currentColour, (gridWidth * pixelSize) - mouseX, mouseY, pixelSize, pixelSize);
         pixels[(gridHeight - 1) - (mouseX/pixelSize)][(gridWidth - 1) - (mouseY/pixelSize)] = new Pixel(currentColour, (gridWidth * pixelSize) - mouseX, (gridHeight * pixelSize) - mouseY, pixelSize, pixelSize);
         pixelGrid.repaint(); 
