@@ -119,7 +119,6 @@ public class GUI extends JFrame{
     public void exportGridAsPNG(JPanel panel){
         BufferedImage image = new BufferedImage(grid.getWidth(), grid.getHeight(), BufferedImage.TYPE_INT_ARGB);
         
-        
         Graphics2D g2d = image.createGraphics();
         this.grid.printAll(g2d);
 
