@@ -3,47 +3,72 @@ import java.awt.Dimension;
 import java.awt.Label;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import java.awt.*;
 
 public class Home extends JFrame {
     private JPanel PhotoPanel;
     private boolean hover = false;
-    
+    private Image idleImage;
+    private Image hoverImage;
+
     public Home(){
-        initPhotoPanel();
+        initTemp();
         initFrame();
     }
 
-    private void initPhotoPanel(){
-        this.PhotoPanel = new JPanel();
-        this.PhotoPanel.setBounds(0,0,724, 824);
-        ImageIcon gif = new ImageIcon("resources/home/idle.gif");
-        JLabel gifLabel = new JLabel(gif);
-        this.PhotoPanel.add(gifLabel);
+    private void initTemp(){
+        this.PhotoPanel = new JPanel() {
+            protected void paintComponent(Graphics g){
+                super.paintComponent(g);
+                if (hover){
+                    g.drawImage(hoverImage, 0, 0, this);
+                } else {
+                    g.drawImage(idleImage, 0, 0, this);
+                }
+            }
+        };
 
-        this.PhotoPanel.addMouseMotionListener(new MouseAdapter() {
+        idleImage = new ImageIcon("resources/home/idle.gif").getImage();
+        hoverImage = new ImageIcon("resources/home/hover.png").getImage();
+        
+        this.PhotoPanel.addMouseMotionListener(new MouseMotionAdapter() {
             public void mouseMoved(MouseEvent e){
                 int x = e.getX();
                 int y = e.getY();
 
-                if (x >= 0 && x <= 100 && y >= 0 && y <= 100){
-                    hover = true;
+                if (x >= 185 && x <= 320 && y >= 325 && y <= 450){
+                    if (!hover){
+                        hover = true;
+                        repaint();
+                    }
                 } else {
-                    hover = false;
+                    if (hover){
+                        hover = false;
+                        repaint();
+                    }
                 }
-
-                if (hover){
-                    System.out.println("yes");
-                    ImageIcon hover = new ImageIcon("resources/home/hover.gif");
-                    gifLabel.setIcon(hover);
-                }
-            }            
+            }
         });
+
+        this.PhotoPanel.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e){
+                int x = e.getX();
+                int y = e.getY();
+
+                if (x >= 185 && x <= 320 && y >= 325 && y <= 450){
+                    createPixel();
+                }
+            }
+        });
+
+        this.PhotoPanel.setBounds(0,0, 603, 683);
     }
 
     private void initFrame(){
@@ -51,9 +76,16 @@ public class Home extends JFrame {
         //FrameImage backgroundImage = new FrameImage("resources/bg.gif", 724, 824);
         //setContentPane(backgroundImage);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(new Dimension(1000, 860));
+        setSize(new Dimension(613,720));
         setBackground(new Color(0,0,0));
         setVisible(true);
         setResizable(false);
+    }
+
+    private GUI temp;
+
+    private void createPixel(){
+        this.temp = new GUI();
+        dispose();
     }
 }
