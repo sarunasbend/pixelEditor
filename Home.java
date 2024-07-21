@@ -22,18 +22,7 @@ public class Home extends JFrame {
     public Home(){
         this.tempName = new HomePanel(0, 0, 0, 0);
         this.PhotoPanel = tempName.getHomePanel();
-        addActionListeners();
         initFrame();
-    }
-
-    private void addActionListeners(){
-        addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent e){
-                if (tempName.getCreatePixelEditor()){
-                    createPixel();
-                }
-            }
-        });
     }
 
     private void initFrame(){

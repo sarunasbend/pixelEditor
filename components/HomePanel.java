@@ -22,7 +22,9 @@ public class HomePanel {
 
     private Image idleImage;
     private Image hoverImage;
+    private Image transitionImage;
     private boolean isHover = false;
+    private boolean isTransition = false;
 
     public HomePanel(int xPadding, int panelWidth, int yPadding, int panelHeight){
         this.xPadding = xPadding;
@@ -32,6 +34,7 @@ public class HomePanel {
 
         setIdleImage("resources/home/idle.gif");
         setHoverImage("resources/home/hover.png");
+        setTransitionImage("resources/home/transition.gif");
         setHomePanel();
     }
 
@@ -43,6 +46,10 @@ public class HomePanel {
         this.hoverImage = new ImageIcon(path).getImage();
     }
 
+    private void setTransitionImage(String path){
+        this.transitionImage = new ImageIcon(path).getImage();
+    }
+
     private void setHomePanel(){
         this.homePanel = new JPanel() {
             protected void paintComponent(Graphics g){
@@ -51,6 +58,11 @@ public class HomePanel {
                     g.drawImage(hoverImage, xPadding, yPadding, this);
                 } else {
                     g.drawImage(idleImage, xPadding, yPadding, this);
+                } 
+
+                if (isTransition){
+                    idleImage = new ImageIcon("resources/home/transition.gif").getImage();
+                    isTransition = false;
                 }
             }
         };
@@ -71,7 +83,7 @@ public class HomePanel {
                         homePanel.repaint();
                     }
                 }
-            }      
+            }
         });
 
         this.homePanel.addMouseListener(new MouseAdapter() {
@@ -80,19 +92,14 @@ public class HomePanel {
                 int y = e.getY();
 
                 if (x >= 185 && x <= 320 && y >= 325 && y <= 450){
-                    setCreatePixelEditor();
+                    setTransition();
                 }
             }
         });
     }
 
-    public void setCreatePixelEditor(){
-        System.out.println("IT WORKED!!!");
-        this.createPixelEditor = true;
-    }
-
-    public boolean getCreatePixelEditor(){
-        return this.createPixelEditor;
+    public void setTransition(){
+        this.isTransition = true;
     }
 
     public JPanel getHomePanel(){
