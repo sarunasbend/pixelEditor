@@ -26,6 +26,8 @@ public class HomePanel {
     private boolean isHover = false;
     private boolean isTransition = false;
 
+    private boolean switchMode = false;
+
     public HomePanel(int xPadding, int panelWidth, int yPadding, int panelHeight){
         this.xPadding = xPadding;
         this.panelWidth = panelWidth;
@@ -55,14 +57,15 @@ public class HomePanel {
             protected void paintComponent(Graphics g){
                 super.paintComponent(g);
                 if (isHover){
-                    g.drawImage(hoverImage, xPadding, yPadding, this);
+                    g.drawImage(hoverImage, 0, 0, this); //changed to 0 temp
                 } else {
-                    g.drawImage(idleImage, xPadding, yPadding, this);
+                    g.drawImage(idleImage, 0, 0, this); //changed to 0 temp
                 } 
 
                 if (isTransition){
                     idleImage = new ImageIcon("resources/home/transition.gif").getImage();
                     isTransition = false;
+                    switchMode();
                 }
             }
         };
@@ -104,5 +107,13 @@ public class HomePanel {
 
     public JPanel getHomePanel(){
         return this.homePanel;
+    }
+
+    public void setMode(){
+        this.switchMode = true;
+    }
+
+    public boolean switchMode(){
+        return this.switchMode;
     }
 }
