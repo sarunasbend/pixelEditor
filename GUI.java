@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -32,10 +33,18 @@ public class GUI extends JFrame{
 
     private JButton export;
 
+    private JButton replaceColour;
+
+    private Image importedImage;
+
     public GUI(){
-        setSize(new Dimension(405, 700));
-        this.grid = new Grid(0, 0, 20, 20, 20);
+        setSize(new Dimension(800, 800));
+
+        this.importedImage = new ImageIcon("exports.png").getImage();
+
+        this.grid = new Grid(importedImage, 0, 0, 10, 400, 400);
         this.pixelGrid = this.grid.getGridPanel();
+
         this.redButton = new JButton("RED");
         this.redButton.setBounds(0, 400, 100, 100);
         this.redButton.addMouseListener(new MouseAdapter() {
@@ -101,9 +110,18 @@ public class GUI extends JFrame{
             }          
         });
 
+        this.replaceColour = new JButton("REPLACE");
+        this.replaceColour.setBounds(0, 700, 100, 50);
+        this.replaceColour.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent event){
+                grid.replaceColour(new Color(0,0,0), new Color(255, 0, 0));
+            }
+        });
+
 
         setLayout(null);
-        add(redButton);
+        add(pixelGrid);
+        /*add(redButton);
         add(blueButton);
         add(greenButton);
         add(pixelGrid);
@@ -111,6 +129,7 @@ public class GUI extends JFrame{
         add(xMirror);
         add(yMirror);
         add(export);
+        add(replaceColour);*/
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(true);
         setVisible(true);
