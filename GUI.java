@@ -2,12 +2,13 @@ import javax.swing.*;
 
 public class GUI extends JFrame {
     public GUI(){
-        setSize(1000, 1000);
+        setSize(800,600);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Converter converter = new Converter("Blue Elephant.bmp");
-        Canvas newCanvas = new Canvas(converter.getPixels(), converter.getWidth(), converter.getHeight());
 
-        add(newCanvas.getCanvas());
+        Canvas blankCanvas = new Canvas(0,0,20,200,200);
+        add(blankCanvas.getCanvas());
+        
+
     }
 }
