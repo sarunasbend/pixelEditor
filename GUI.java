@@ -6,7 +6,7 @@ public class GUI extends JFrame {
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Canvas blankCanvas = new Canvas(0,0,20,200,200);
+        Canvas blankCanvas = new Canvas(0,0,20,20,20);
         add(blankCanvas.getCanvas());
         
 
