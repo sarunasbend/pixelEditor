@@ -7,8 +7,8 @@ public class GUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Canvas blankCanvas = new Canvas(0,0,20,20,20);
-        Converter converter = new Converter("download.jpg");
-        ImageCanvas imageCanvas = new ImageCanvas(0, 0, 1, converter.getWidth(), converter.getHeight(), converter.getPixels());
+        Converter converter = new Converter("Blue Elephant.bmp");
+        ImageCanvas imageCanvas = new ImageCanvas(0, 0, 20, converter.getWidth(), converter.getHeight(), converter.getPixels());
         add(imageCanvas.getCanvas());
     
     }
