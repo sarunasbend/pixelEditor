@@ -40,7 +40,7 @@ public class ImageCanvas {
         public Color getPixelColour(){return this.pixelColour;}
         public Rectangle getRectangle(){return this.rectangle;}
         //setters
-        public void setPixelColour(Color colour){pixelColour = colour;}        
+        public void setPixelColour(Color colour){pixelColour = colour;}
     }
 
     private JPanel canvasPanel;
@@ -59,6 +59,7 @@ public class ImageCanvas {
 
     private Pixel[][] pixels;
     private Color currentColour = new Color(0, 0, 0);
+    private Color transparentColour = new Color(100,100,100,50);
     private int brushSize = 1; //brush sizes can either by 1, 4, 9 - determines the number of pixels coloured with one click
 
     private int mouseClickX = 1;
@@ -84,7 +85,7 @@ public class ImageCanvas {
         this.imagePixelData = imagePixelData;
         this.pixels = new Pixel[canvasHeight][canvasWidth];
         System.out.println(cW + " : " + cH);
-        //setPixelData();
+        setPixelData();
         createImageCanvas();
         canvasPanel.repaint();
     }
@@ -121,8 +122,15 @@ public class ImageCanvas {
                                 g2d.drawRect(pixel.x, pixel.y, pixel.width, pixel.height);
                                 g2d.fillRect(pixel.x, pixel.y, pixel.width, pixel.height); 
                             }
-
                         }
+                    }
+                    if (pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize] != null){
+                        Rectangle temp = pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize].getRectangle();
+                        g2d.setColor(Color.RED);
+                        g2d.drawRect(temp.x, temp.y, temp.width, temp.height);
+                        g2d.setColor(transparentColour);
+                        g2d.fillRect(temp.x, temp.y, temp.width, temp.height);
+                        g2d.setColor(currentColour);
                     }
                 }
             }
@@ -196,7 +204,6 @@ public class ImageCanvas {
             g2d.fillRect(hoverRectangle.x, hoverRectangle.y, hoverRectangle.width, hoverRectangle.height);
             g2d.setColor(currentColour);
         }
-
     }
 
     
