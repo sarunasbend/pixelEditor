@@ -179,13 +179,13 @@ public class Canvas {
         int x = xPanel; //starts where the panel starts in GUI
         int y = yPanel;
         for (int i = 0 ; i < canvasHeight; i++){
-            y = yPanel;
+            x = xPanel;
             for (int j = 0; j < canvasWidth; j++){
                 
                 pixels[i][j] = new Pixel(x, y, globalPixelSize, new Color(imagePixelData[i][j][0], imagePixelData[i][j][1], imagePixelData[i][j][2]));
-                y = y + globalPixelSize;
+                x = x + globalPixelSize;
             }
-            x = x + globalPixelSize;
+            y = y + globalPixelSize;
         }
     }
     
