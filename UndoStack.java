@@ -12,16 +12,19 @@ import java.io.BufferedWriter;
 import java.io.BufferedReader;
 import java.util.Scanner;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.util.ArrayList;
 
 public class UndoStack {
     private String path;
     private int stackSize = 20; //max amount of actions that can be stored in stack
     private File undoStackTxt;
+    private File tempStackTxt;
     private ArrayList<String> storeContents;
 
     public UndoStack(String path){
         this.path = path;
+        this.storeContents = new ArrayList<String>();
         try {
             undoStackTxt = new File(path + "undoStack.txt");
             undoStackTxt.createNewFile();
@@ -44,6 +47,7 @@ public class UndoStack {
         try (BufferedWriter pusher = new BufferedWriter(new FileWriter(path + "undoStack.txt", true))){
             pusher.write("[ADD][" + x + " : " + y + "]");
             pusher.newLine();
+            pusher.close();
         } catch (IOException e){
             e.printStackTrace();
         }
@@ -58,31 +62,59 @@ public class UndoStack {
         try (BufferedWriter pusher = new BufferedWriter(new FileWriter(path + "undoStack.txt", true))){
             pusher.write("[ERS][" + x + " : " + y + "]");
             pusher.newLine();
+            pusher.close();
         } catch (IOException e){
             e.printStackTrace();
         }
     }
 
-    public void popUndoStack(){
+    /**
+     * Method pops the last pushed line of the undoStack.txt, removes that line and rewrites
+     * Very convoluted way of doing this, and I feel like I can implement this much better.
+     * Returns NUL if stack is empty
+     */
+    public String popUndoStack(){
+        String returnValue = "NUL";
         try (BufferedReader popper = new BufferedReader(new FileReader(path + "undoStack.txt"))){
-            System.out.println(popper.readLine());
+            String line;
+            while ((line = popper.readLine()) != null){
+                storeContents.add(line);
+                returnValue = line;
+            }
+            popper.close();
         } catch (IOException e){
             e.printStackTrace();
         }
-        
-    }
 
+        try (BufferedWriter clear = new BufferedWriter(new FileWriter(path + "undoStack.txt", false))){
+            clear.write("");
+            clear.close();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
+        try (BufferedWriter rewrite = new BufferedWriter(new FileWriter(path + "undoStack.txt", true))){
+            int index = 0;
+            while (index < storeContents.size() - 1){
+                rewrite.write(storeContents.get(index));
+                rewrite.newLine();
+                index++;
+            }
+            rewrite.close();
+            storeContents.clear();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        return returnValue;
+    }
+    /**
+     * Deltes the undoStack.txt file, after use.
+     */
     public void deleteUndoStack(){
         if (undoStackTxt.delete()){
             System.out.println("File Deleted");
         } else {
             System.out.println("File does not Exist");
         }
-        try {
-            Scanner temp = new Scanner(undoStackTxt);
-        } catch (FileNotFoundException e){
-
-        }
-
     }
 }
