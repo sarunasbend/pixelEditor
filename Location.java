@@ -36,7 +36,7 @@ public class Location implements Runnable {
                 // Get the Point instance representing the location
                 Point location = pointerInfo.getLocation();
                 // Print the location (x, y coordinates)
-                text.setText(location.x + " : " + location.y);
+                text.setText((location.x / pixelSize) + " : " + (location.y / pixelSize));
             }
 
             // Sleep for a short interval to avoid excessive CPU usage

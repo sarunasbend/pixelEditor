@@ -94,7 +94,6 @@ public class Canvas {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 drawCanvas(g2d);
-                drawHover(g2d);
                 g2d.setRenderingHints(renderingHints);
                 g2d.setClip(xPanel, yPanel, canvasWidth * globalPixelSize, canvasHeight * globalPixelSize); //might have to change to specify bounds
                 
@@ -179,20 +178,6 @@ public class Canvas {
             }
         });
     }
-
-    private void setPixelData(){
-        int x = xPanel; //starts where the panel starts in GUI
-        int y = yPanel;
-        for (int i = 0 ; i < canvasHeight; i++){
-            x = xPanel;
-            for (int j = 0; j < canvasWidth; j++){
-                
-                pixels[i][j] = new Pixel(x, y, globalPixelSize, new Color(imagePixelData[i][j][0], imagePixelData[i][j][1], imagePixelData[i][j][2]));
-                x = x + globalPixelSize;
-            }
-            y = y + globalPixelSize;
-        }
-    }
     
     //the canvas grid
     private void drawCanvas(Graphics2D g2d){
@@ -204,11 +189,6 @@ public class Canvas {
             g2d.drawLine(xPanel, j, xPanel + (canvasWidth * globalPixelSize), j);
         }
     }
-
-    //hover rectangle used to indicate tile about to be placed by user
-    private void drawHover(Graphics2D g2d){
-    }
-    
 
     public JPanel getCanvas(){return this.canvasPanel;}
 }
