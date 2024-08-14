@@ -57,6 +57,7 @@ public class Canvas {
 
     private Pixel[][] pixels;
     private Color currentColour = new Color(0, 0, 0);
+    private Color transparentColour = new Color(100,100,100,50);
     private int brushSize = 1; //brush sizes can either by 1, 4, 9 - determines the number of pixels coloured with one click
 
     private int mouseClickX = -1;
@@ -83,6 +84,7 @@ public class Canvas {
         canvasHeight = cH;
         this.pixels = new Pixel[canvasHeight][canvasWidth]; //height and width is the resolution
         createPixelCanvas();
+        canvasPanel.repaint();
     }
 
     //image canvas constructor
@@ -120,6 +122,14 @@ public class Canvas {
                             }
 
                         }
+                    }
+                    if (pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize] != null){
+                        Rectangle temp = pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize].getRectangle();
+                        g2d.setColor(Color.RED);
+                        g2d.drawRect(temp.x, temp.y, temp.width, temp.height);
+                        g2d.setColor(transparentColour);
+                        g2d.fillRect(temp.x, temp.y, temp.width, temp.height);
+                        g2d.setColor(currentColour);
                     }
                 }
             }
@@ -209,9 +219,9 @@ public class Canvas {
                                 g2d.drawRect(pixel.x, pixel.y, pixel.width, pixel.height);
                                 g2d.fillRect(pixel.x, pixel.y, pixel.width, pixel.height); 
                             }
-
                         }
                     }
+                    
                 }
             }
         };
@@ -260,8 +270,10 @@ public class Canvas {
             public void mouseMoved(MouseEvent event){
                 mouseMoveX = ((event.getX() / globalPixelSize) * globalPixelSize);
                 mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
-                hoverRectangle = new Rectangle(mouseMoveX, mouseMoveY, globalPixelSize, globalPixelSize); //creates a rectangle on mouse location 
-                canvasPanel.repaint(); //so that it is consistently updated
+                if (((xPanel <= mouseMoveX) && (mouseMoveX <= canvasWidth * globalPixelSize)) && ((yPanel <= mouseMoveY) && (mouseMoveY <= canvasHeight * globalPixelSize))){
+                    hoverRectangle = new Rectangle(mouseMoveX, mouseMoveY, globalPixelSize, globalPixelSize); //creates a rectangle on mouse location 
+                    canvasPanel.repaint(); //so that it is consistently updated
+                }
             }
         });
     }
@@ -280,7 +292,7 @@ public class Canvas {
     //hover rectangle used to indicate tile about to be placed by user
     private void drawHover(Graphics2D g2d){
         if (((xPanel <= mouseMoveX) && (mouseMoveX <= canvasWidth * globalPixelSize)) && ((yPanel <= mouseMoveY) && (mouseMoveY <= canvasHeight * globalPixelSize))){
-            g2d.setColor(new Color(255,0,0));
+            g2d.setColor(transparentColour);
             g2d.drawRect(hoverRectangle.x, hoverRectangle.y, hoverRectangle.width, hoverRectangle.height);
             g2d.fillRect(hoverRectangle.x, hoverRectangle.y, hoverRectangle.width, hoverRectangle.height);
             g2d.setColor(currentColour);

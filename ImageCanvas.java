@@ -124,13 +124,15 @@ public class ImageCanvas {
                             }
                         }
                     }
-                    if (pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize] != null){
-                        Rectangle temp = pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize].getRectangle();
-                        g2d.setColor(Color.RED);
-                        g2d.drawRect(temp.x, temp.y, temp.width, temp.height);
-                        g2d.setColor(transparentColour);
-                        g2d.fillRect(temp.x, temp.y, temp.width, temp.height);
-                        g2d.setColor(currentColour);
+                    if ((mouseMoveY/globalPixelSize < canvasHeight) && (mouseMoveX/globalPixelSize < canvasWidth)){
+                        if (pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize] != null){
+                            Rectangle temp = pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize].getRectangle();
+                            g2d.setColor(Color.RED);
+                            g2d.drawRect(temp.x, temp.y, temp.width, temp.height);
+                            g2d.setColor(transparentColour);
+                            g2d.fillRect(temp.x, temp.y, temp.width, temp.height);
+                            g2d.setColor(currentColour);
+                        }
                     }
                 }
             }
@@ -199,13 +201,12 @@ public class ImageCanvas {
     //hover rectangle used to indicate tile about to be placed by user
     private void drawHover(Graphics2D g2d){
         if (((xPanel <= mouseMoveX) && (mouseMoveX <= canvasWidth * globalPixelSize)) && ((yPanel <= mouseMoveY) && (mouseMoveY <= canvasHeight * globalPixelSize))){
-            g2d.setColor(new Color(255,0,0));
+            g2d.setColor(transparentColour);
             g2d.drawRect(hoverRectangle.x, hoverRectangle.y, hoverRectangle.width, hoverRectangle.height);
             g2d.fillRect(hoverRectangle.x, hoverRectangle.y, hoverRectangle.width, hoverRectangle.height);
             g2d.setColor(currentColour);
         }
     }
 
-    
     public JPanel getCanvas(){return this.canvasPanel;}
 }
