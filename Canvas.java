@@ -87,19 +87,6 @@ public class Canvas {
         canvasPanel.repaint();
     }
 
-    //image canvas constructor
-    public Canvas (int xP, int yP, int pS, int cW, int cH, int[][][] imagePixelData){
-        xPanel = xP;
-        yPanel = yP;
-        globalPixelSize = pS;
-        canvasWidth = cW;
-        canvasHeight = cH;
-        this.imagePixelData = imagePixelData;
-        this.pixels = new Pixel[canvasHeight][canvasWidth];
-        setPixelData();
-        createImageCanvas();
-    }
-
     private void createPixelCanvas(){
         this.canvasPanel = new JPanel(){
             @Override
@@ -123,13 +110,21 @@ public class Canvas {
 
                         }
                     }
-                    if (pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize] != null){
-                        Rectangle temp = pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize].getRectangle();
-                        g2d.setColor(Color.RED);
-                        g2d.drawRect(temp.x, temp.y, temp.width, temp.height);
-                        g2d.setColor(transparentColour);
-                        g2d.fillRect(temp.x, temp.y, temp.width, temp.height);
-                        g2d.setColor(currentColour);
+                    if ((mouseMoveY/globalPixelSize < canvasHeight) && (mouseMoveX/globalPixelSize < canvasWidth)){
+                        if (pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize] != null){
+                            Rectangle temp = pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize].getRectangle();
+                            g2d.setColor(Color.RED);
+                            g2d.drawRect(temp.x, temp.y, temp.width, temp.height);
+                            g2d.setColor(transparentColour);
+                            g2d.fillRect(temp.x, temp.y, temp.width, temp.height);
+                            g2d.setColor(currentColour);
+                        } else if (((xPanel <= mouseMoveX) && (mouseMoveX <= canvasWidth * globalPixelSize)) && ((yPanel <= mouseMoveY) && (mouseMoveY <= canvasHeight * globalPixelSize))){
+                            g2d.setColor(Color.RED);
+                            g2d.drawRect(hoverRectangle.x, hoverRectangle.y, hoverRectangle.width, hoverRectangle.height);
+                            g2d.setColor(transparentColour);
+                            g2d.fillRect(hoverRectangle.x, hoverRectangle.y, hoverRectangle.width, hoverRectangle.height);
+                            g2d.setColor(currentColour);
+                        }
                     }
                 }
             }
@@ -145,7 +140,7 @@ public class Canvas {
                  if (!xMirror && !yMirror){
                     if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
                         //adds unmirrored tiles
-                        pixels[mouseClickX/globalPixelSize][mouseClickY/globalPixelSize] = new Pixel( mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                        pixels[mouseClickY/globalPixelSize][mouseClickX/globalPixelSize] = new Pixel( mouseClickX, mouseClickY, globalPixelSize, currentColour);
                         canvasPanel.repaint(); 
                     } 
                 }
@@ -168,7 +163,7 @@ public class Canvas {
                      if (!xMirror && !yMirror){
                         if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
                             //adds unmirrored tiles
-                            pixels[mouseClickX/globalPixelSize][mouseClickY/globalPixelSize] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                            pixels[mouseClickY/globalPixelSize][mouseClickX/globalPixelSize] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
                             canvasPanel.repaint(); 
                         } 
                     }
@@ -199,85 +194,6 @@ public class Canvas {
         }
     }
     
-    private void createImageCanvas(){
-        this.canvasPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g){
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                drawCanvas(g2d);
-                drawHover(g2d);
-                g2d.setRenderingHints(renderingHints);
-                g2d.setClip(xPanel, yPanel, canvasWidth * globalPixelSize, canvasHeight * globalPixelSize); //might have to change to specify bounds
-
-                if ((mouseClickX >= 0) && (mouseClickY >= 0)){
-                    for (int i = 0; i < canvasHeight; i++){
-                        for (int j = 0; j < canvasWidth; j++){
-                            if (pixels[i][j] != null){
-                                Rectangle pixel = pixels[i][j].getRectangle();    
-                                g2d.setColor(pixels[i][j].getPixelColour());
-                                g2d.drawRect(pixel.x, pixel.y, pixel.width, pixel.height);
-                                g2d.fillRect(pixel.x, pixel.y, pixel.width, pixel.height); 
-                            }
-                        }
-                    }
-                    
-                }
-            }
-        };
-
-        this.canvasPanel.setSize(this.canvasWidth * this.globalPixelSize, this.canvasHeight * this.globalPixelSize);
-        this.canvasPanel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent event){
-                isMouseHeldDown = true;
-                mouseClickX = mouseMoveX = ((event.getX() / globalPixelSize) * globalPixelSize);
-                mouseClickY = mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
-                 if (!xMirror && !yMirror){
-                    if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
-                        //adds unmirrored tiles
-                        pixels[mouseClickX/globalPixelSize][mouseClickY/globalPixelSize] = new Pixel( mouseClickX, mouseClickY, globalPixelSize, currentColour);
-                        canvasPanel.repaint(); 
-                    } 
-                }
-                
-            }
-            @Override
-            public void mouseReleased(MouseEvent event){
-                isMouseHeldDown = false;
-            }
-        });
-
-        this.canvasPanel.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent event){
-                if (isMouseHeldDown){
-                    mouseClickX  = mouseMoveX = ((event.getX() / globalPixelSize) * globalPixelSize);
-                    mouseClickY = mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
-                    hoverRectangle = new Rectangle(mouseMoveX, mouseMoveY, globalPixelSize, globalPixelSize);
-                    
-                     if (!xMirror && !yMirror){
-                        if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
-                            //adds unmirrored tiles
-                            pixels[mouseClickX/globalPixelSize][mouseClickY/globalPixelSize] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
-                            canvasPanel.repaint(); 
-                        } 
-                    }
-                }
-            }
-            //tracks the position of the mouse whenever it is moved by the user
-            @Override
-            public void mouseMoved(MouseEvent event){
-                mouseMoveX = ((event.getX() / globalPixelSize) * globalPixelSize);
-                mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
-                if (((xPanel <= mouseMoveX) && (mouseMoveX <= canvasWidth * globalPixelSize)) && ((yPanel <= mouseMoveY) && (mouseMoveY <= canvasHeight * globalPixelSize))){
-                    hoverRectangle = new Rectangle(mouseMoveX, mouseMoveY, globalPixelSize, globalPixelSize); //creates a rectangle on mouse location 
-                    canvasPanel.repaint(); //so that it is consistently updated
-                }
-            }
-        });
-    }
-
     //the canvas grid
     private void drawCanvas(Graphics2D g2d){
         for (int i = xPanel; i < (canvasWidth * globalPixelSize) + xPanel; i+=globalPixelSize){
@@ -291,12 +207,6 @@ public class Canvas {
 
     //hover rectangle used to indicate tile about to be placed by user
     private void drawHover(Graphics2D g2d){
-        if (((xPanel <= mouseMoveX) && (mouseMoveX <= canvasWidth * globalPixelSize)) && ((yPanel <= mouseMoveY) && (mouseMoveY <= canvasHeight * globalPixelSize))){
-            g2d.setColor(transparentColour);
-            g2d.drawRect(hoverRectangle.x, hoverRectangle.y, hoverRectangle.width, hoverRectangle.height);
-            g2d.fillRect(hoverRectangle.x, hoverRectangle.y, hoverRectangle.width, hoverRectangle.height);
-            g2d.setColor(currentColour);
-        }
     }
     
 
