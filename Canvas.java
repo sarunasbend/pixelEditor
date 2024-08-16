@@ -1,3 +1,4 @@
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.AWTException;
 import java.awt.Color;
@@ -42,6 +43,7 @@ public class Canvas {
     }
 
     private JPanel canvasPanel;
+    private JLabel mouseLocation;
     private int xPanel; //where the panel will be placed, needed for graphics 
     private int yPanel; 
     private int canvasWidth;
@@ -85,6 +87,7 @@ public class Canvas {
         this.pixels = new Pixel[canvasHeight][canvasWidth]; //height and width is the resolution
         createPixelCanvas();
         canvasPanel.repaint();
+        createMouseLabel();  
     }
 
     private void createPixelCanvas(){
@@ -157,6 +160,7 @@ public class Canvas {
                 if (isMouseHeldDown){
                     mouseClickX  = mouseMoveX = ((event.getX() / globalPixelSize) * globalPixelSize);
                     mouseClickY = mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
+                    setMouseLocationText(mouseMoveX / globalPixelSize, mouseMoveY / globalPixelSize);
                     hoverRectangle = new Rectangle(mouseMoveX, mouseMoveY, globalPixelSize, globalPixelSize);
                     
                      if (!xMirror && !yMirror){
@@ -173,6 +177,7 @@ public class Canvas {
             public void mouseMoved(MouseEvent event){
                 mouseMoveX = ((event.getX() / globalPixelSize) * globalPixelSize);
                 mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
+                setMouseLocationText(mouseMoveX / globalPixelSize, mouseMoveY / globalPixelSize);
                 hoverRectangle = new Rectangle(mouseMoveX, mouseMoveY, globalPixelSize, globalPixelSize); //creates a rectangle on mouse location 
                 canvasPanel.repaint(); //so that it is consistently updated
             }
@@ -190,5 +195,19 @@ public class Canvas {
         }
     }
 
+    public void createMouseLabel(){
+        this.mouseLocation = new JLabel("0 : 0");
+        this.mouseLocation.setSize(100,50);
+    }
+
+    public void setMouseLocationText(int mouseX, int mouseY){
+        this.mouseLocation.setText(mouseX + " : " + mouseY);
+    }
+
     public JPanel getCanvas(){return this.canvasPanel;}
+    public JLabel getMouseLabel(){return this.mouseLocation;}
+
+    //temporary 
+    public void undoAction(String action){
+    }
 }
