@@ -7,13 +7,6 @@ import javax.imageio.ImageIO;
 
 public class Driver {
     public static void main(String[] args) {
-        GUI t = new GUI();
-    //     UndoStack temp = new UndoStack("");
-    //     System.out.println(temp.popUndoStack());
-    //     System.out.println(temp.popUndoStack());
-    //     System.out.println(temp.popUndoStack());
-    //     System.out.println(temp.popUndoStack());
-    //     System.out.println(temp.popUndoStack());
-    //     temp.deleteUndoStack();
+        GUI t = new GUI(1200,800,60,60);
     }
 }

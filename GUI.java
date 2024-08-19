@@ -1,48 +1,76 @@
-import java.awt.Rectangle;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
 import javax.swing.*;
+import java.awt.*;
 
 public class GUI extends JFrame {
-    public GUI(){
+    private int width;
+    private int height;
+    private Insets insets;
+    private int pixelSize;
+    private int canvasWidth;
+    private int canvasHeight;
+
+    private int canvasXPadding;
+    private int canvasYPadding;
+
+    public GUI(int width, int height, int canvasWidth, int canvasHeight) {
+        this.width = width;
+        this.height = height;
+        this.canvasWidth = canvasWidth;
+        this.canvasHeight = canvasHeight;
+        this.pixelSize = ((800/canvasHeight) < (800/canvasWidth)) ? (800/canvasHeight) : (800/canvasWidth); //calculates the pixel size for the canvas
+        this.canvasXPadding = (800 - (pixelSize * canvasWidth)) / 2;
+        this.canvasYPadding = (800 - (pixelSize * canvasHeight)) / 2;
+
+        
+        setForeground(Color.GREEN);
         setLayout(null);
-        setSize(800,600);
-        setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(true);
+        setVisible(true);
+        setSize(width, height);
+        addComponents();
+        setInsets();
+        
+    }
 
-        Canvas blankCanvas = new Canvas(0,0,20,20,20);
-        // Converter converter = new Converter("Blue Elephant.bmp");
-        // ImageCanvas imageCanvas = new ImageCanvas(0, 0, 20, converter.getWidth(), converter.getHeight(), converter.getPixels());
-        // Location mouse = new Location(0, 0, 100, 50, 20);
-        // Create a new Thread with the tracker instance
-        // Thread trackerThread = new Thread(mouse);
+    private void setInsets() {
+        this.insets = getInsets();
+        setSize(width + insets.left + insets.right, height + insets.bottom + insets.top);
+        System.out.println(width + insets.left + insets.right + " : " + height + insets.bottom + insets.top);
+        System.out.println(width);
+        System.out.println(height);
+        System.out.println(insets.left);
+        System.out.println(insets.right);
+        System.out.println(insets.top);
+        System.out.println(insets.bottom);
+    }
 
-        // Start the thread
-        // trackerThread.start();
-        // JLabel text = mouse.getText();
-        // text.setLocation(0,500);
-        // add(text);
+    private void addComponents() {
+        
+        // Assuming Canvas is a custom class you have implemented
+        Canvas blankCanvas = new Canvas(0, 0,pixelSize , canvasWidth, canvasHeight);
+        JPanel canvas = blankCanvas.getCanvas();
+        canvas.setLocation(canvasXPadding, canvasYPadding);
 
-        UndoStack undo = new UndoStack("");
-        undo.pushDrawn(0, 0);
+        JPanel left = new JPanel();
+        left.setBounds(0, 0, 200, 800);
+        left.setBackground(Color.RED);
 
-        add(blankCanvas.getCanvas());
+        JPanel middle = new JPanel();
+        middle.setBounds(200, 0, 800, 800);
+        middle.setBackground(Color.BLUE);
+        middle.setLayout(null);
+        middle.add(canvas);
 
-        JButton undoButton = new JButton("Undo");
-        undoButton.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent event){
-                blankCanvas.undoAction(undo.popUndoStack());
-            }
-        });
+        JPanel right = new JPanel();
+        right.setBounds(1000, 0, 200, 800);
+        right.setBackground(Color.GREEN);
+        JLabel mouse = blankCanvas.getMouseLabel();
+        mouse.setBounds(0, 100, 50, 50);
+        right.add(mouse);
 
-        undoButton.setBounds(0,500,100,50);
-
-        add(undoButton);
-        JLabel loc = blankCanvas.getMouseLabel();
-        loc.setBounds(200,500,100,50);
-        add(loc);
-
+        add(left);
+        add(middle);
+        add(right);
     }
 }

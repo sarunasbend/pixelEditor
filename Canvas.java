@@ -8,13 +8,10 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Robot;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 
 public class Canvas {
     public class Pixel {
@@ -79,8 +76,8 @@ public class Canvas {
     //blank canvas constructor
     //pixel size is determined before the creation of the program
     public Canvas(int xP, int yP, int pS, int cW, int cH){
-        xPanel = xP;
-        yPanel = yP;
+        xPanel = 0;
+        yPanel = 0;
         globalPixelSize = pS;
         canvasWidth = cW;
         canvasHeight = cH;
@@ -92,12 +89,13 @@ public class Canvas {
 
     private void createPixelCanvas(){
         this.canvasPanel = new JPanel(){
+            //main method of the program, allows painting of pixels
             @Override
             protected void paintComponent(Graphics g){
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 drawCanvas(g2d);
-                g2d.setRenderingHints(renderingHints);
+                g2d.setRenderingHints(renderingHints); //anti-aliasing
                 g2d.setClip(xPanel, yPanel, canvasWidth * globalPixelSize, canvasHeight * globalPixelSize); //might have to change to specify bounds
                 
                 if ((mouseClickX >= 0) && (mouseClickY >= 0)){
@@ -140,7 +138,7 @@ public class Canvas {
                 mouseClickX = mouseMoveX = ((event.getX() / globalPixelSize) * globalPixelSize);
                 mouseClickY = mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
                  if (!xMirror && !yMirror){
-                    if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
+                    if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > xPanel) && (mouseClickY > yPanel)){
                         //adds unmirrored tiles
                         pixels[mouseClickY/globalPixelSize][mouseClickX/globalPixelSize] = new Pixel( mouseClickX, mouseClickY, globalPixelSize, currentColour);
                         canvasPanel.repaint(); 
@@ -186,11 +184,12 @@ public class Canvas {
     
     //the canvas grid
     private void drawCanvas(Graphics2D g2d){
-        for (int i = xPanel; i < (canvasWidth * globalPixelSize) + xPanel; i+=globalPixelSize){
+        //vertical lines
+        for (int i = xPanel; i <= (canvasWidth * globalPixelSize); i+=globalPixelSize){
             g2d.drawLine(i, yPanel, i, yPanel + (canvasHeight * globalPixelSize));
         }
-
-        for (int j = yPanel; j < (canvasHeight * globalPixelSize) + yPanel; j+=globalPixelSize){
+        //horizontal lines
+        for (int j = yPanel; j <= (canvasHeight * globalPixelSize); j+=globalPixelSize){
             g2d.drawLine(xPanel, j, xPanel + (canvasWidth * globalPixelSize), j);
         }
     }
