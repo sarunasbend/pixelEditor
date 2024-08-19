@@ -1,4 +1,9 @@
 import javax.swing.*;
+
+import components.EditorTitle;
+import components.EraserToolLabel;
+import components.PenToolLabel;
+
 import java.awt.*;
 
 public class GUI extends JFrame {
@@ -13,41 +18,36 @@ public class GUI extends JFrame {
     private int canvasYPadding;
 
     public GUI(int width, int height, int canvasWidth, int canvasHeight) {
-        this.width = width;
+        this.width = width; //resolution of application
         this.height = height;
-        this.canvasWidth = canvasWidth;
+        this.canvasWidth = canvasWidth; //canvas size
         this.canvasHeight = canvasHeight;
-        this.pixelSize = ((800/canvasHeight) < (800/canvasWidth)) ? (800/canvasHeight) : (800/canvasWidth); //calculates the pixel size for the canvas
-        this.canvasXPadding = (800 - (pixelSize * canvasWidth)) / 2;
+        //calculates the pixel size for the canvas, pixel size is smaller result from calculation
+        this.pixelSize = ((800/canvasHeight) < (800/canvasWidth)) ? (800/canvasHeight) : (800/canvasWidth); 
+        this.canvasXPadding = (800 - (pixelSize * canvasWidth)) / 2; //centers the canvas 
         this.canvasYPadding = (800 - (pixelSize * canvasHeight)) / 2;
 
-        
-        setForeground(Color.GREEN);
+        setForeground(Color.WHITE);
         setLayout(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setResizable(true);
-        setVisible(true);
+        setResizable(false);
+        setVisible(true); //program needs to be visible before insets are calculated
         setSize(width, height);
-        addComponents();
-        setInsets();
+        addComponents(); //adds components
+        setInsets(); //sets the size of the JFrame to actually be width x height
         
     }
 
+    /**
+     * When creating a JFrame of n x m dimensions, it won't actually be n x m size but it will rather be the whole window tab size.
+     * Insets are the width and height taken up by the OS to display the program 
+     */
     private void setInsets() {
         this.insets = getInsets();
         setSize(width + insets.left + insets.right, height + insets.bottom + insets.top);
-        System.out.println(width + insets.left + insets.right + " : " + height + insets.bottom + insets.top);
-        System.out.println(width);
-        System.out.println(height);
-        System.out.println(insets.left);
-        System.out.println(insets.right);
-        System.out.println(insets.top);
-        System.out.println(insets.bottom);
     }
 
     private void addComponents() {
-        
-        // Assuming Canvas is a custom class you have implemented
         Canvas blankCanvas = new Canvas(0, 0,pixelSize , canvasWidth, canvasHeight);
         JPanel canvas = blankCanvas.getCanvas();
         canvas.setLocation(canvasXPadding, canvasYPadding);
@@ -55,6 +55,8 @@ public class GUI extends JFrame {
         JPanel left = new JPanel();
         left.setBounds(0, 0, 200, 800);
         left.setBackground(Color.RED);
+        left.setLayout(null);
+        addButtons(left); //TEMPORARY METHOD TO TEST FUNCTIONALITY
 
         JPanel middle = new JPanel();
         middle.setBounds(200, 0, 800, 800);
@@ -72,5 +74,20 @@ public class GUI extends JFrame {
         add(left);
         add(middle);
         add(right);
+    }
+
+    public void addButtons(JPanel left){
+        EditorTitle title = new EditorTitle(200, 100, "components\\resources\\EditorTitle.png");
+        JLabel temp = title.getEditorTitle();
+        temp.setBounds(0,0,200,100);
+        PenToolLabel temp2 = new PenToolLabel(100, 100, "components\\resources\\PenTool.png");
+        JLabel penTool = temp2.getPenToolLabel();
+        penTool.setBounds(0,100,100,50);
+        EraserToolLabel temp3 = new EraserToolLabel(100,50, "components\\\\resources\\\\EraserTool.png");
+        JLabel eraserTool = temp3.getEraserToolLabel();
+        eraserTool.setBounds(100,100,100,50);
+        left.add(temp);
+        left.add(penTool);
+        left.add(eraserTool);
     }
 }
