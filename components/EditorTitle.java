@@ -3,8 +3,7 @@ package components;
 import javax.swing.*;
 import java.awt.*;
 
-public class EditorTitle {
-    private JLabel title;
+public class EditorTitle extends JLabel {
     private int width;
     private int height;
     private String imagePath;
@@ -19,11 +18,7 @@ public class EditorTitle {
 
     private void setEditorTitle(){
         imageIcon = new ImageIcon(imagePath);
-        title = new JLabel(imageIcon);
-        title.setSize(width, height);
-    }
-
-    public JLabel getEditorTitle(){
-        return this.title;
+        setIcon(imageIcon);
+        setSize(width, height);
     }
 }

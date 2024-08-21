@@ -3,8 +3,7 @@ package components;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-public class EraserToolLabel {
-    private JLabel toolLabel;
+public class EraserToolLabel extends JLabel{
     private int width;
     private int height;
     private String imagePath;
@@ -19,11 +18,7 @@ public class EraserToolLabel {
 
     private void setEditorTitle(){
         imageIcon = new ImageIcon(imagePath);
-        toolLabel = new JLabel(imageIcon);
-        toolLabel.setSize(width, height);
-    }
-
-    public JLabel getEraserToolLabel(){
-        return this.toolLabel;
+        setIcon(imageIcon);
+        setSize(width, height);
     }
 }

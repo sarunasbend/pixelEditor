@@ -3,13 +3,13 @@ package components;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-public class PenToolLabel extends JLabel{
+public class YMirrorToolLabel extends JLabel{
     private int width;
     private int height;
     private String imagePath;
     private ImageIcon imageIcon;
 
-    public PenToolLabel(int width, int height, String imagePath){
+    public YMirrorToolLabel(int width, int height, String imagePath){
         this.width = width;
         this.height = height;
         this.imagePath = imagePath;

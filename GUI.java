@@ -1,8 +1,15 @@
 import javax.swing.*;
 
+import components.BucketFillToolLabel;
+import components.ColourPickerToolLabel;
 import components.EditorTitle;
 import components.EraserToolLabel;
 import components.PenToolLabel;
+import components.RedoToolLabel;
+import components.TrashToolLabel;
+import components.UndoToolLabel;
+import components.XMirrorToolLabel;
+import components.YMirrorToolLabel;
 
 import java.awt.*;
 
@@ -54,7 +61,7 @@ public class GUI extends JFrame {
 
         JPanel left = new JPanel();
         left.setBounds(0, 0, 200, 800);
-        left.setBackground(Color.RED);
+        left.setBackground(Color.BLACK);
         left.setLayout(null);
         addButtons(left); //TEMPORARY METHOD TO TEST FUNCTIONALITY
 
@@ -66,7 +73,7 @@ public class GUI extends JFrame {
 
         JPanel right = new JPanel();
         right.setBounds(1000, 0, 200, 800);
-        right.setBackground(Color.GREEN);
+        right.setBackground(Color.BLACK);
         JLabel mouse = blankCanvas.getMouseLabel();
         mouse.setBounds(0, 100, 50, 50);
         right.add(mouse);
@@ -76,18 +83,53 @@ public class GUI extends JFrame {
         add(right);
     }
 
+    /*
+     * Adds all the buttons for the essential tool buttons (and title label)
+     * All elements are added to the left panel of the JFrame 
+     * Modular to an extent (until I run out of space within JPanel)
+     */
     public void addButtons(JPanel left){
-        EditorTitle title = new EditorTitle(200, 100, "components\\resources\\EditorTitle.png");
-        JLabel temp = title.getEditorTitle();
-        temp.setBounds(0,0,200,100);
-        PenToolLabel temp2 = new PenToolLabel(100, 100, "components\\resources\\PenTool.png");
-        JLabel penTool = temp2.getPenToolLabel();
+        JLabel editorTitle = new EditorTitle(200, 100, "components\\resources\\EditorTitle.png");
+        editorTitle.setBounds(0,0,200,100);
+
+        JLabel penTool = new PenToolLabel(100, 50, "components\\resources\\PenTool.png");
         penTool.setBounds(0,100,100,50);
-        EraserToolLabel temp3 = new EraserToolLabel(100,50, "components\\\\resources\\\\EraserTool.png");
-        JLabel eraserTool = temp3.getEraserToolLabel();
+
+        JLabel eraserTool = new EraserToolLabel(100, 50, "components\\resources\\EraserTool.png");
         eraserTool.setBounds(100,100,100,50);
-        left.add(temp);
+
+        JLabel colourPickerTool = new ColourPickerToolLabel(100, 50, "components\\resources\\ColourPickerTool.png");
+        colourPickerTool.setBounds(0,150,100,50);
+
+        JLabel bucketFillTool = new BucketFillToolLabel(100, 50, "components\\resources\\BucketFillTool.png");
+        bucketFillTool.setBounds(100,150,100,50);
+
+        JLabel redoTool = new RedoToolLabel(100, 50, "components\\resources\\RedoTool.png");
+        redoTool.setBounds(0,200,100,50);
+
+        JLabel undoTool = new UndoToolLabel(100, 50, "components\\resources\\UndoTool.png");
+        undoTool.setBounds(100,200,100,50);
+
+        JLabel xMirrorTool = new XMirrorToolLabel(100, 50, "components\\resources\\XMirrorTool.png");
+        xMirrorTool.setBounds(0,250,100,50);
+
+        JLabel yMirrorTool = new YMirrorToolLabel(100, 50, "components\\resources\\YMirrorTool.png");
+        yMirrorTool.setBounds(100,250,100,50);
+
+        JLabel trashTool = new TrashToolLabel(100, 50, "components\\resources\\TrashTool.png");
+        trashTool.setBounds(0,300,100,50);
+        
+        //adds all elements to Panel
+        left.add(editorTitle);
         left.add(penTool);
         left.add(eraserTool);
+        left.add(bucketFillTool);
+        left.add(colourPickerTool);
+        left.add(redoTool);
+        left.add(undoTool);
+
+        left.add(xMirrorTool);
+        left.add(yMirrorTool);
+        left.add(trashTool);
     }
 }
