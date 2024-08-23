@@ -58,6 +58,7 @@ public class Canvas {
     private Color currentColour = new Color(0, 0, 0);
     private Color transparentColour = new Color(100,100,100,50);
     private int brushSize = 1; //brush sizes can either by 1, 4, 9 - determines the number of pixels coloured with one click
+    private int currentCanvasMode = 0; //this is the tool currently selected, only one can be selected (with the exception of x/y mirror tools being combined)
 
     private int mouseClickX = -1;
     private int mouseClickY = -1;
@@ -65,8 +66,8 @@ public class Canvas {
     private int mouseMoveX = -1;
     private int mouseMoveY = -1;
 
-    private boolean hasMouseMoved = false;
-    private boolean hasMousePressed = false;
+    // private boolean hasMouseMoved = false;
+    // private boolean hasMousePressed = false;
     private boolean isMouseHeldDown = false;
     private Rectangle hoverRectangle;
 
@@ -205,6 +206,29 @@ public class Canvas {
 
     public JPanel getCanvas(){return this.canvasPanel;}
     public JLabel getMouseLabel(){return this.mouseLocation;}
+
+    /*
+     * the mode is the current tool being used, mode is represented by an integer.
+     * following integers represent the following modes:
+     * 1 - default brush/draw
+     * 2 - eraser
+     * 3 - colour picker
+     * 4 - bucket fill
+     * 5 - redo
+     * 6 - undo
+     * 7 - x-mirror
+     * 8 - y-mirror
+     * 9 - x/y-mirror
+     * 10 - clear canvas
+     * ...
+     * more to be added
+     * these are the current tool i want to implment
+     */
+    public void setCurrentCanvasMode(int mode){
+        this.currentCanvasMode = mode;
+    }
+
+    private int getCurrentCanvasMode(){return this.currentCanvasMode;}
 
     //temporary 
     public void undoAction(String action){

@@ -45,7 +45,7 @@ public class UndoStack {
      */
     public void pushDrawn(int x, int y){
         try (BufferedWriter pusher = new BufferedWriter(new FileWriter(path + "undoStack.txt", true))){
-            pusher.write("[ADD][" + x + " : " + y + "]");
+            pusher.write("ADD " + x + " " + y + " ");
             pusher.newLine();
             pusher.close();
         } catch (IOException e){
@@ -60,7 +60,7 @@ public class UndoStack {
 
     public void pushEraser(int x, int y){
         try (BufferedWriter pusher = new BufferedWriter(new FileWriter(path + "undoStack.txt", true))){
-            pusher.write("[ERS][" + x + " : " + y + "]");
+            pusher.write("ERS " + x + " " + y + " ");
             pusher.newLine();
             pusher.close();
         } catch (IOException e){
@@ -107,6 +107,7 @@ public class UndoStack {
         }
         return returnValue;
     }
+
     /**
      * Deltes the undoStack.txt file, after use.
      */
