@@ -138,14 +138,42 @@ public class Canvas {
                 isMouseHeldDown = true;
                 mouseClickX = mouseMoveX = ((event.getX() / globalPixelSize) * globalPixelSize);
                 mouseClickY = mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
-                 if (!xMirror && !yMirror){
-                    if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > xPanel) && (mouseClickY > yPanel)){
-                        //adds unmirrored tiles
-                        pixels[mouseClickY/globalPixelSize][mouseClickX/globalPixelSize] = new Pixel( mouseClickX, mouseClickY, globalPixelSize, currentColour);
-                        canvasPanel.repaint(); 
-                    } 
-                }
                 
+                switch (currentCanvasMode){
+                    case 0:
+                        if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
+                            pixels[mouseClickY/globalPixelSize][mouseClickX/globalPixelSize] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                            canvasPanel.repaint(); 
+                        }
+                        break;
+                    case 1:
+                        if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
+                            pixels[mouseClickY/globalPixelSize][mouseClickX/globalPixelSize] = null;
+                            canvasPanel.repaint(); 
+                        }
+                        break;
+                    case 2: //colourpicker
+                        break;
+                    case 3: //bucketfill
+                        break;
+                    case 4: //redo
+                        break;
+                    case 5: //undo
+                        break;
+                    case 6: //ymirror
+                        break;
+                    case 7: //xmirror
+                        break;
+                    case 8: //trash
+                        for (int i = 0; i < canvasHeight; i++){
+                            for (int j = 0; j < canvasWidth; j++){
+                                pixels[i][j] = null;
+                            }
+                        }
+                        break;
+                    default:
+                        System.out.println("No mode selected");
+                }
             }
             @Override
             public void mouseReleased(MouseEvent event){
@@ -161,13 +189,41 @@ public class Canvas {
                     mouseClickY = mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
                     setMouseLocationText(mouseMoveX / globalPixelSize, mouseMoveY / globalPixelSize);
                     hoverRectangle = new Rectangle(mouseMoveX, mouseMoveY, globalPixelSize, globalPixelSize);
-                    
-                     if (!xMirror && !yMirror){
-                        if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
-                            //adds unmirrored tiles
-                            pixels[mouseClickY/globalPixelSize][mouseClickX/globalPixelSize] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
-                            canvasPanel.repaint(); 
-                        } 
+
+                    switch (currentCanvasMode){
+                        case 0: //pen
+                            if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
+                                pixels[mouseClickY/globalPixelSize][mouseClickX/globalPixelSize] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                canvasPanel.repaint(); 
+                            }
+                            break;
+                        case 1: //eraser
+                            if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
+                                pixels[mouseClickY/globalPixelSize][mouseClickX/globalPixelSize] = null;
+                                canvasPanel.repaint(); 
+                            }
+                            break;
+                        case 2: //colourpicker
+                            break;
+                        case 3: //bucketfill
+                            break;
+                        case 4: //redo
+                            break;
+                        case 5: //undo
+                            break;
+                        case 6: //ymirror
+                            break;
+                        case 7: //xmirror
+                            break;
+                        case 8: //trash
+                            for (int i = 0; i < canvasHeight; i++){
+                                for (int j = 0; j < canvasWidth; j++){
+                                    pixels[i][j] = null;
+                                }
+                            }
+                            break;
+                        default: 
+                            System.out.println("No mode selected");
                     }
                 }
             }
@@ -210,16 +266,16 @@ public class Canvas {
     /*
      * the mode is the current tool being used, mode is represented by an integer.
      * following integers represent the following modes:
-     * 1 - default brush/draw
-     * 2 - eraser
-     * 3 - colour picker
-     * 4 - bucket fill
-     * 5 - redo
-     * 6 - undo
-     * 7 - x-mirror
-     * 8 - y-mirror
-     * 9 - x/y-mirror
-     * 10 - clear canvas
+     * 0 - default brush/draw
+     * 1 - eraser
+     * 2 - colour picker
+     * 3 - bucket fill
+     * 4 - redo
+     * 5 - undo
+     * 6 - x-mirror
+     * 7 - y-mirror
+     * 8 - x/y-mirror
+     * 9 - trash 
      * ...
      * more to be added
      * these are the current tool i want to implment

@@ -28,7 +28,7 @@ public class UndoToolLabel extends JLabel {
     }
 
     //mouse listener will be in Editor GUI class, this method is called if user presses the title 
-    public void setSelectedTitle(){
+    public void setSelectedTool(){
         selected = !selected;
         if (selected){
             setIcon(selectedIcon);

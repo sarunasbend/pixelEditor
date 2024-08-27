@@ -17,6 +17,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class GUI extends JFrame {
+    private Canvas blankCanvas;
+
     private int width;
     private int height;
     private Insets insets;
@@ -38,7 +40,8 @@ public class GUI extends JFrame {
     private YMirrorToolLabel yMirrorTool;
     private TrashToolLabel trashTool;
 
-    private int currentCanvasMode = 0;
+    private int currentCanvasMode;
+    private int previousCanvasMode = 0;
 
     public GUI(int width, int height, int canvasWidth, int canvasHeight) {
         this.width = width; //resolution of application
@@ -58,7 +61,7 @@ public class GUI extends JFrame {
         setSize(width, height);
         addComponents(); //adds components
         setInsets(); //sets the size of the JFrame to actually be width x height
-        
+        highlightTool();
     }
 
     /**
@@ -71,7 +74,7 @@ public class GUI extends JFrame {
     }
 
     private void addComponents() {
-        Canvas blankCanvas = new Canvas(0, 0,pixelSize , canvasWidth, canvasHeight);
+        blankCanvas = new Canvas(0, 0,pixelSize , canvasWidth, canvasHeight);
         JPanel canvas = blankCanvas.getCanvas();
         canvas.setLocation(canvasXPadding, canvasYPadding);
 
@@ -109,31 +112,31 @@ public class GUI extends JFrame {
         editorTitle = new EditorTitle(200, 100, "components\\resources\\EditorTitle.png", "components\\\\resources\\\\EditorTitleHover.gif");
         editorTitle.setBounds(0,0,200,100);
         
-        penTool = new PenToolLabel(100, 50, "components\\resources\\PenTool.png");
+        penTool = new PenToolLabel(100, 50, "components\\resources\\PenTool.png", "components\\resources\\PenToolHighlight.png");
         penTool.setBounds(0,100,100,50);
 
-        eraserTool = new EraserToolLabel(100, 50, "components\\resources\\EraserTool.png");
+        eraserTool = new EraserToolLabel(100, 50, "components\\resources\\EraserTool.png", "components\\resources\\EraserToolHighlight.png");
         eraserTool.setBounds(100,100,100,50);
 
-        colourPickerTool = new ColourPickerToolLabel(100, 50, "components\\resources\\ColourPickerTool.png");
+        colourPickerTool = new ColourPickerToolLabel(100, 50, "components\\resources\\ColourPickerTool.png", "components\\resources\\ColourPickerToolHighlight.png");
         colourPickerTool.setBounds(0,150,100,50);
 
-        bucketFillTool = new BucketFillToolLabel(100, 50, "components\\resources\\BucketFillTool.png");
+        bucketFillTool = new BucketFillToolLabel(100, 50, "components\\resources\\BucketFillTool.png", "components\\resources\\BucketFillToolHighlight.png");
         bucketFillTool.setBounds(100,150,100,50);
 
-        redoTool = new RedoToolLabel(100, 50, "components\\resources\\RedoTool.png");
+        redoTool = new RedoToolLabel(100, 50, "components\\resources\\RedoTool.png" ,"components\\resources\\RedoToolHighlight.png");
         redoTool.setBounds(0,200,100,50);
 
-        undoTool = new UndoToolLabel(100, 50, "components\\resources\\UndoTool.png");
+        undoTool = new UndoToolLabel(100, 50, "components\\resources\\UndoTool.png", "components\\resources\\UndoToolHighlight.png");
         undoTool.setBounds(100,200,100,50);
 
-        xMirrorTool = new XMirrorToolLabel(100, 50, "components\\resources\\XMirrorTool.png");
+        xMirrorTool = new XMirrorToolLabel(100, 50, "components\\resources\\XMirrorTool.png", "components\\resources\\XMirrorToolHighlight.png");
         xMirrorTool.setBounds(0,250,100,50);
 
-        yMirrorTool = new YMirrorToolLabel(100, 50, "components\\resources\\YMirrorTool.png");
+        yMirrorTool = new YMirrorToolLabel(100, 50, "components\\resources\\YMirrorTool.png", "components\\resources\\YMirrorToolHighlight.png");
         yMirrorTool.setBounds(100,250,100,50);
 
-        trashTool = new TrashToolLabel(100, 50, "components\\resources\\TrashTool.png");
+        trashTool = new TrashToolLabel(100, 50, "components\\resources\\TrashTool.png", "components\\resources\\TrashToolHighlight.png");
         trashTool.setBounds(0,300,100,50);
         
         //adds all elements to Panel
@@ -158,58 +161,130 @@ public class GUI extends JFrame {
 
         penTool.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
-                penTool.setSelectedTitle();
+                previousCanvasMode = currentCanvasMode;
+                penTool.setSelectedTool();
+                currentCanvasMode = 0;
+                highlightTool();
+                blankCanvas.setCurrentCanvasMode(currentCanvasMode);
             }
         });
 
         eraserTool.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
-
+                previousCanvasMode = currentCanvasMode;
+                eraserTool.setSelectedTool();
+                currentCanvasMode = 1;
+                highlightTool();
+                blankCanvas.setCurrentCanvasMode(currentCanvasMode);
             }
         });
 
         colourPickerTool.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
-
+                previousCanvasMode = currentCanvasMode;
+                colourPickerTool.setSelectedTool();
+                currentCanvasMode = 2;
+                highlightTool();
+                blankCanvas.setCurrentCanvasMode(currentCanvasMode);
             }
         });
 
         bucketFillTool.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
-
+                previousCanvasMode = currentCanvasMode;
+                bucketFillTool.setSelectedTool();
+                currentCanvasMode = 3;
+                highlightTool();
+                blankCanvas.setCurrentCanvasMode(currentCanvasMode);
             }
         });
 
         redoTool.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
-
+                previousCanvasMode = currentCanvasMode;
+                redoTool.setSelectedTool();
+                currentCanvasMode = 4;
+                highlightTool();
+                blankCanvas.setCurrentCanvasMode(currentCanvasMode);
             }
         });
 
         undoTool.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
-
+                previousCanvasMode = currentCanvasMode;
+                undoTool.setSelectedTool();
+                currentCanvasMode = 5;
+                highlightTool();
+                blankCanvas.setCurrentCanvasMode(currentCanvasMode);
             }
         });
 
         xMirrorTool.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
-
+                previousCanvasMode = currentCanvasMode;
+                xMirrorTool.setSelectedTool();
+                currentCanvasMode = 6;
+                highlightTool();
+                blankCanvas.setCurrentCanvasMode(currentCanvasMode);
             }
         });
 
         yMirrorTool.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
-                
+                previousCanvasMode = currentCanvasMode;
+                yMirrorTool.setSelectedTool();
+                currentCanvasMode = 7;
+                highlightTool();
+                blankCanvas.setCurrentCanvasMode(currentCanvasMode);
             }
         });
 
         trashTool.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
-
+                previousCanvasMode = currentCanvasMode;
+                trashTool.setSelectedTool();
+                currentCanvasMode = 8;
+                highlightTool();
+                blankCanvas.setCurrentCanvasMode(currentCanvasMode);
             }
         });
+    }
 
-
+    /**
+     * when the user selects a tool, it should highlight the tool, and only that tool
+     */
+    private void highlightTool(){
+        switch (previousCanvasMode){
+            case 0: //pen
+                penTool.setSelectedTool();
+                break;
+            case 1: //eraser
+                eraserTool.setSelectedTool();
+                break;
+            case 2: //colourpicker
+                colourPickerTool.setSelectedTool();
+                break;
+            case 3: //bucketfill
+                bucketFillTool.setSelectedTool();
+                break;
+            case 4: //redotool
+                redoTool.setSelectedTool();
+                break;
+            case 5: //undotool
+                undoTool.setSelectedTool();
+                break;
+            case 6: //xMirror
+                xMirrorTool.setSelectedTool();
+                break;
+            case 7: //yMirror
+                yMirrorTool.setSelectedTool();
+                break;
+            case 8: //trash
+                trashTool.setSelectedTool();
+                break;
+            default:
+                currentCanvasMode = 0;
+        }
     }
 }
+
