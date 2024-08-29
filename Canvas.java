@@ -138,41 +138,78 @@ public class Canvas {
                 isMouseHeldDown = true;
                 mouseClickX = mouseMoveX = ((event.getX() / globalPixelSize) * globalPixelSize);
                 mouseClickY = mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
-                
-                switch (currentCanvasMode){
-                    case 0:
-                        if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
-                            pixels[mouseClickY/globalPixelSize][mouseClickX/globalPixelSize] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                int indexX = mouseClickX / globalPixelSize;
+                int indexY = mouseClickY / globalPixelSize;
+
+                if ((indexX < canvasWidth) && (indexY < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
+                    int midpoint;                
+                    switch (currentCanvasMode){
+                        case 0:
+                            pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
                             canvasPanel.repaint(); 
-                        }
-                        break;
-                    case 1:
-                        if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
-                            pixels[mouseClickY/globalPixelSize][mouseClickX/globalPixelSize] = null;
+                            break;
+                        case 1:
+                            pixels[indexY][indexX] = null;
                             canvasPanel.repaint(); 
-                        }
-                        break;
-                    case 2: //colourpicker
-                        break;
-                    case 3: //bucketfill
-                        break;
-                    case 4: //redo
-                        break;
-                    case 5: //undo
-                        break;
-                    case 6: //ymirror
-                        break;
-                    case 7: //xmirror
-                        break;
-                    case 8: //trash
-                        for (int i = 0; i < canvasHeight; i++){
-                            for (int j = 0; j < canvasWidth; j++){
-                                pixels[i][j] = null;
+                            break;
+                        case 2: //colourpicker
+                            break;
+                        case 3: //bucketfill
+                            break;
+                        case 4: //redo
+                            break;
+                        case 5: //undo
+                            break;
+                        case 6: //xmirror
+                            pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                            midpoint = canvasHeight / 2;
+                            if (canvasHeight % 2 == 0){
+                                if (indexY < midpoint){
+                                    mouseClickY = (canvasHeight * globalPixelSize) - mouseClickY - globalPixelSize;
+                                    pixels[canvasHeight - 1 - indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                }
+                            } else {
+                                if (indexY < midpoint){
+                                    mouseClickY = (canvasHeight * globalPixelSize) - mouseClickY - globalPixelSize;
+                                    pixels[canvasHeight - 1 - indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                } else if (indexY > midpoint){
+                                    mouseClickY = (canvasHeight - 1 - indexY) * globalPixelSize;
+                                    pixels[midpoint - (indexY - midpoint)][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                }
                             }
-                        }
-                        break;
-                    default:
-                        System.out.println("No mode selected");
+                            canvasPanel.repaint();
+                            break;
+                        case 7: //ymirror
+                            pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                            midpoint = canvasWidth / 2;
+                            if (canvasWidth % 2 == 0) {
+                                // Even width canvas
+                                if (indexX < midpoint) {
+                                    mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
+                                    pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                }
+                            } else {
+                                // Odd width canvas
+                                if (indexX < midpoint) {
+                                    mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
+                                    pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                } else if (indexX > midpoint) {
+                                    mouseClickX = (canvasWidth - 1 - indexX) * globalPixelSize;
+                                    pixels[indexY][midpoint - (indexX - midpoint)] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                }
+                            }
+                            canvasPanel.repaint();
+                            break;
+                        case 8: //trash
+                            for (int i = 0; i < canvasHeight; i++){
+                                for (int j = 0; j < canvasWidth; j++){
+                                    pixels[i][j] = null;
+                                }
+                            }
+                            break;
+                        default:
+                            System.out.println("No mode selected");
+                    }
                 }
             }
             @Override
@@ -189,41 +226,78 @@ public class Canvas {
                     mouseClickY = mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
                     setMouseLocationText(mouseMoveX / globalPixelSize, mouseMoveY / globalPixelSize);
                     hoverRectangle = new Rectangle(mouseMoveX, mouseMoveY, globalPixelSize, globalPixelSize);
-
-                    switch (currentCanvasMode){
-                        case 0: //pen
-                            if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
-                                pixels[mouseClickY/globalPixelSize][mouseClickX/globalPixelSize] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                    int indexX = mouseClickX / globalPixelSize;
+                    int indexY = mouseClickY / globalPixelSize;
+                    
+                    if ((indexX < canvasWidth) && (indexY < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
+                        int midpoint;
+                        switch (currentCanvasMode){
+                            case 0: //pen
+                                pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                canvasPanel.repaint();
+                                break;
+                            case 1: //eraser
+                                pixels[indexY][indexX] = null;
                                 canvasPanel.repaint(); 
-                            }
-                            break;
-                        case 1: //eraser
-                            if ((mouseClickX/globalPixelSize < canvasWidth) && (mouseClickY/globalPixelSize < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
-                                pixels[mouseClickY/globalPixelSize][mouseClickX/globalPixelSize] = null;
-                                canvasPanel.repaint(); 
-                            }
-                            break;
-                        case 2: //colourpicker
-                            break;
-                        case 3: //bucketfill
-                            break;
-                        case 4: //redo
-                            break;
-                        case 5: //undo
-                            break;
-                        case 6: //ymirror
-                            break;
-                        case 7: //xmirror
-                            break;
-                        case 8: //trash
-                            for (int i = 0; i < canvasHeight; i++){
-                                for (int j = 0; j < canvasWidth; j++){
-                                    pixels[i][j] = null;
+                                break;
+                            case 2: //colourpicker
+                                break;
+                            case 3: //bucketfill
+                                break;
+                            case 4: //redo
+                                break;
+                            case 5: //undo
+                                break;
+                            case 6: //xmirror
+                                pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                midpoint = canvasHeight / 2;
+                                if (canvasHeight % 2 == 0){
+                                    if (indexY < midpoint){
+                                        mouseClickY = (canvasHeight * globalPixelSize) - mouseClickY - globalPixelSize;
+                                        pixels[canvasHeight - 1 - indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    }
+                                } else {
+                                    if (indexY < midpoint){
+                                        mouseClickY = (canvasHeight * globalPixelSize) - mouseClickY - globalPixelSize;
+                                        pixels[canvasHeight - 1 - indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    } else if (indexY > midpoint){
+                                        mouseClickY = (canvasHeight - 1 - indexY) * globalPixelSize;
+                                        pixels[midpoint - (indexY - midpoint)][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    }
                                 }
-                            }
-                            break;
-                        default: 
-                            System.out.println("No mode selected");
+                                canvasPanel.repaint();
+                                break;
+                            case 7: //xmirror   
+                                pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                midpoint = canvasWidth / 2;
+                                if (canvasWidth % 2 == 0) {
+                                    // Even width canvas
+                                    if (indexX < midpoint) {
+                                        mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
+                                        pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    }
+                                } else {
+                                    // Odd width canvas
+                                    if (indexX < midpoint) {
+                                        mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
+                                        pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    } else if (indexX > midpoint) {
+                                        mouseClickX = (canvasWidth - 1 - indexX) * globalPixelSize;
+                                        pixels[indexY][midpoint - (indexX - midpoint)] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    }
+                                }
+                                canvasPanel.repaint();
+                                break;
+                            case 8: //trash
+                                for (int i = 0; i < canvasHeight; i++){
+                                    for (int j = 0; j < canvasWidth; j++){
+                                        pixels[i][j] = null;
+                                    }
+                                }
+                                break;
+                            default: 
+                                System.out.println("No mode selected");
+                        }
                     }
                 }
             }

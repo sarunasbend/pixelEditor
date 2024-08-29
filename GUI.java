@@ -10,6 +10,8 @@ import components.TrashToolLabel;
 import components.UndoToolLabel;
 import components.XMirrorToolLabel;
 import components.YMirrorToolLabel;
+import components.ZoomInToolLabel;
+import components.ZoomOutToolLabel;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -39,6 +41,8 @@ public class GUI extends JFrame {
     private XMirrorToolLabel xMirrorTool;
     private YMirrorToolLabel yMirrorTool;
     private TrashToolLabel trashTool;
+    private ZoomInToolLabel zoomInTool;
+    private ZoomOutToolLabel zoomOutTool;
 
     private int currentCanvasMode;
     private int previousCanvasMode = 0;
@@ -74,7 +78,7 @@ public class GUI extends JFrame {
     }
 
     private void addComponents() {
-        blankCanvas = new Canvas(0, 0,pixelSize , canvasWidth, canvasHeight);
+        blankCanvas = new Canvas(0, 0, pixelSize, canvasWidth, canvasHeight);
         JPanel canvas = blankCanvas.getCanvas();
         canvas.setLocation(canvasXPadding, canvasYPadding);
 
@@ -82,7 +86,7 @@ public class GUI extends JFrame {
         left.setBounds(0, 0, 200, 800);
         left.setBackground(Color.BLACK);
         left.setLayout(null);
-        addButtons(left); //TEMPORARY METHOD TO TEST FUNCTIONALITY
+        addLeftButtons(left); //TEMPORARY METHOD TO TEST FUNCTIONALITY
         addActionListeners();
 
         JPanel middle = new JPanel();
@@ -94,9 +98,8 @@ public class GUI extends JFrame {
         JPanel right = new JPanel();
         right.setBounds(1000, 0, 200, 800);
         right.setBackground(Color.BLACK);
-        JLabel mouse = blankCanvas.getMouseLabel();
-        mouse.setBounds(0, 100, 50, 50);
-        right.add(mouse);
+        right.setLayout(null);
+        addRightButtons(right);
 
         add(left);
         add(middle);
@@ -108,7 +111,7 @@ public class GUI extends JFrame {
      * All elements are added to the left panel of the JFrame 
      * Modular to an extent (until I run out of space within JPanel)
      */
-    public void addButtons(JPanel left){
+    public void addLeftButtons(JPanel left){
         editorTitle = new EditorTitle(200, 100, "components\\resources\\EditorTitle.png", "components\\\\resources\\\\EditorTitleHover.gif");
         editorTitle.setBounds(0,0,200,100);
         
@@ -139,6 +142,12 @@ public class GUI extends JFrame {
         trashTool = new TrashToolLabel(100, 50, "components\\resources\\TrashTool.png", "components\\resources\\TrashToolHighlight.png");
         trashTool.setBounds(0,300,100,50);
         
+        zoomInTool = new ZoomInToolLabel(100, 50, "components\\resources\\ZoomInTool.png" , "components\\resources\\ZoomInToolHighlight.png");
+        zoomInTool.setBounds(0,350,100,50);
+
+        zoomOutTool = new ZoomOutToolLabel(100, 50, "components\\resources\\ZoomOutTool.png" , "components\\resources\\ZoomOutToolHighlight.png");
+        zoomOutTool.setBounds(100,350,100,50);
+
         //adds all elements to Panel
         left.add(editorTitle);
         left.add(penTool);
@@ -150,6 +159,26 @@ public class GUI extends JFrame {
         left.add(xMirrorTool);
         left.add(yMirrorTool);
         left.add(trashTool);
+        left.add(zoomInTool);
+        left.add(zoomOutTool);
+    }
+
+    public void addRightButtons(JPanel right){
+        JLabel mouse = blankCanvas.getMouseLabel();
+        mouse.setBounds(0, 700, 200, 100);
+        
+        JPanel miniMap = new JPanel();
+        miniMap.setBackground(Color.RED);
+        miniMap.setBounds(0,0,200,200);
+        
+        JPanel colourPalette = new JPanel();
+        colourPalette.setBackground(Color.GREEN);
+        colourPalette.setBounds(0,200,200,100);
+
+        right.add(colourPalette);
+        right.add(miniMap);
+        right.add(mouse);
+        
     }
 
     private void addActionListeners(){
