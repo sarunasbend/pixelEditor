@@ -1,3 +1,4 @@
+import javax.sound.sampled.Line;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.AWTException;
@@ -55,6 +56,7 @@ public class Canvas {
     private final RenderingHints renderingHints  = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //anti-aliasing
 
     private Pixel[][] pixels;
+    private Line[] grid;
     private Color currentColour = new Color(0, 0, 0);
     private Color transparentColour = new Color(100,100,100,50);
     private int brushSize = 1; //brush sizes can either by 1, 4, 9 - determines the number of pixels coloured with one click
@@ -83,9 +85,10 @@ public class Canvas {
         canvasWidth = cW;
         canvasHeight = cH;
         this.pixels = new Pixel[canvasHeight][canvasWidth]; //height and width is the resolution
+        initPixels();
         createPixelCanvas();
-        canvasPanel.repaint();
         createMouseLabel();  
+        canvasPanel.repaint();
     }
 
     private void createPixelCanvas(){
@@ -95,7 +98,6 @@ public class Canvas {
             protected void paintComponent(Graphics g){
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
-                drawCanvas(g2d);
                 g2d.setRenderingHints(renderingHints); //anti-aliasing
                 g2d.setClip(xPanel, yPanel, canvasWidth * globalPixelSize, canvasHeight * globalPixelSize); //might have to change to specify bounds
                 
@@ -128,9 +130,16 @@ public class Canvas {
                         }
                     }
                 }
+                // int index = 0;
+                for (int i = xPanel; i <= (canvasWidth * globalPixelSize); i+=globalPixelSize){
+                    g2d.drawLine(i, yPanel, i, yPanel + (canvasHeight * globalPixelSize));
+                }
+                //horizontal lines
+                for (int j = yPanel; j <= (canvasHeight * globalPixelSize); j+=globalPixelSize){
+                    g2d.drawLine(xPanel, j, xPanel + (canvasWidth * globalPixelSize), j);
+                }
             }
         };
-
         this.canvasPanel.setSize(this.canvasWidth * this.globalPixelSize, this.canvasHeight * this.globalPixelSize);
         this.canvasPanel.addMouseListener(new MouseAdapter() {
             @Override
@@ -149,12 +158,17 @@ public class Canvas {
                             canvasPanel.repaint(); 
                             break;
                         case 1:
-                            pixels[indexY][indexX] = null;
+                            pixels[indexY][indexX].setPixelColour(Color.WHITE);
                             canvasPanel.repaint(); 
                             break;
                         case 2: //colourpicker
                             break;
                         case 3: //bucketfill
+                            Color replacedColour = pixels[indexY][indexX].getPixelColour();
+                            if (!currentColour.equals(replacedColour)){
+                                depthFirstSearch(indexY, indexX, replacedColour);
+                            }
+                            canvasPanel.repaint();
                             break;
                         case 4: //redo
                             break;
@@ -203,7 +217,7 @@ public class Canvas {
                         case 8: //trash
                             for (int i = 0; i < canvasHeight; i++){
                                 for (int j = 0; j < canvasWidth; j++){
-                                    pixels[i][j] = null;
+                                    pixels[i][j].setPixelColour(Color.WHITE);
                                 }
                             }
                             break;
@@ -211,6 +225,7 @@ public class Canvas {
                             System.out.println("No mode selected");
                     }
                 }
+                canvasPanel.repaint();
             }
             @Override
             public void mouseReleased(MouseEvent event){
@@ -237,7 +252,7 @@ public class Canvas {
                                 canvasPanel.repaint();
                                 break;
                             case 1: //eraser
-                                pixels[indexY][indexX] = null;
+                                pixels[indexY][indexX].setPixelColour(Color.WHITE);
                                 canvasPanel.repaint(); 
                                 break;
                             case 2: //colourpicker
@@ -291,7 +306,7 @@ public class Canvas {
                             case 8: //trash
                                 for (int i = 0; i < canvasHeight; i++){
                                     for (int j = 0; j < canvasWidth; j++){
-                                        pixels[i][j] = null;
+                                        pixels[i][j].setPixelColour(Color.WHITE);
                                     }
                                 }
                                 break;
@@ -314,16 +329,18 @@ public class Canvas {
     }
     
     //the canvas grid
-    private void drawCanvas(Graphics2D g2d){
-        //vertical lines
-        for (int i = xPanel; i <= (canvasWidth * globalPixelSize); i+=globalPixelSize){
-            g2d.drawLine(i, yPanel, i, yPanel + (canvasHeight * globalPixelSize));
-        }
-        //horizontal lines
-        for (int j = yPanel; j <= (canvasHeight * globalPixelSize); j+=globalPixelSize){
-            g2d.drawLine(xPanel, j, xPanel + (canvasWidth * globalPixelSize), j);
-        }
-    }
+    // private void drawCanvas(Graphics2D g2d){
+    //vertical lines
+    // grid = new Line[canvasHeight + canvasWidth];
+    // int index = 0;
+    //     for (int i = xPanel; i <= (canvasWidth * globalPixelSize); i+=globalPixelSize){
+    //         g2d.drawLine(i, yPanel, i, yPanel + (canvasHeight * globalPixelSize));
+    //     }
+    //     //horizontal lines
+    //     for (int j = yPanel; j <= (canvasHeight * globalPixelSize); j+=globalPixelSize){
+    //         g2d.drawLine(xPanel, j, xPanel + (canvasWidth * globalPixelSize), j);
+    //     }
+    // }
 
     public void createMouseLabel(){
         this.mouseLocation = new JLabel("0 : 0");
@@ -363,4 +380,26 @@ public class Canvas {
     //temporary 
     public void undoAction(String action){
     }
+
+    private void depthFirstSearch(int indexY, int indexX, Color replacedColour){
+        if ((indexY >= canvasHeight) || (indexX >= canvasWidth) || (indexY < 0) || (indexX < 0)){
+            return;
+        } else if (!replacedColour.equals(pixels[indexY][indexX].getPixelColour())) {
+            return;
+        } else {
+            pixels[indexY][indexX].setPixelColour(currentColour);
+            depthFirstSearch(indexY + 1, indexX, replacedColour);
+            depthFirstSearch(indexY - 1, indexX, replacedColour);
+            depthFirstSearch(indexY, indexX + 1, replacedColour);
+            depthFirstSearch(indexY, indexX - 1, replacedColour);
+        }
+    }
+
+    private void initPixels(){
+        for (int i = 0; i < this.canvasHeight; i++){
+            for (int j = 0; j < this.canvasWidth; j++){
+                pixels[i][j] = new Pixel(j * globalPixelSize, i * globalPixelSize, globalPixelSize, Color.WHITE);
+            }
+        }
+    } 
 }
