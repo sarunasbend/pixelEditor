@@ -42,22 +42,22 @@ public class Canvas {
 
     private JPanel canvasPanel;
     private JLabel mouseLocation;
-    private int xPanel; //where the panel will be placed, needed for graphics 
+    private JPanel palettePanel;
+    private JPanel volatilePanel;
+    private int xPanel; 
     private int yPanel; 
     private int canvasWidth;
     private int canvasHeight;
-    private int globalPixelSize = 20; //TEMP VALUE
+    private int globalPixelSize = 20; 
     
-    private int[][][] imagePixelData; //array of pixel RGB
-    private int userImageHeight; //height of imported image
-    private int userImageWidth; //width of imported image
-    private boolean isUserImageDrawn = false;
-
     private final RenderingHints renderingHints  = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //anti-aliasing
 
     private Pixel[][] pixels;
-    private Line[] grid;
     private Color currentColour = new Color(0, 0, 0);
+    private Color[] permanentColourPalette; //colours that user selected using the RGB slider will be added
+    private int permanentColourIndex = 0;
+    private Color[] volatileColourPalette;  //colours that the colour picker selects, temporary colours
+    private int volatileColourIndex = 0;
     private Color transparentColour = new Color(100,100,100,50);
     private int brushSize = 1; //brush sizes can either by 1, 4, 9 - determines the number of pixels coloured with one click
     private int currentCanvasMode = 0; //this is the tool currently selected, only one can be selected (with the exception of x/y mirror tools being combined)
@@ -73,8 +73,7 @@ public class Canvas {
     private boolean isMouseHeldDown = false;
     private Rectangle hoverRectangle;
 
-    private boolean xMirror = false;
-    private boolean yMirror = false;
+
 
     //blank canvas constructor
     //pixel size is determined before the creation of the program
@@ -85,9 +84,12 @@ public class Canvas {
         canvasWidth = cW;
         canvasHeight = cH;
         this.pixels = new Pixel[canvasHeight][canvasWidth]; //height and width is the resolution
+        this.permanentColourPalette = new Color[16]; //palette is able to store 16 colours
+        this.volatileColourPalette = new Color[8]; //last 6 colour picked 
         initPixels();
         createPixelCanvas();
         createMouseLabel();  
+        createVolatilePalette();
         canvasPanel.repaint();
     }
 
@@ -110,7 +112,6 @@ public class Canvas {
                                 g2d.drawRect(pixel.x, pixel.y, pixel.width, pixel.height);
                                 g2d.fillRect(pixel.x, pixel.y, pixel.width, pixel.height); 
                             }
-
                         }
                     }
                     if ((mouseMoveY/globalPixelSize < canvasHeight) && (mouseMoveX/globalPixelSize < canvasWidth)){
@@ -132,12 +133,14 @@ public class Canvas {
                 }
                 // int index = 0;
                 for (int i = xPanel; i <= (canvasWidth * globalPixelSize); i+=globalPixelSize){
+                    g2d.setColor(Color.BLACK);
                     g2d.drawLine(i, yPanel, i, yPanel + (canvasHeight * globalPixelSize));
                 }
                 //horizontal lines
                 for (int j = yPanel; j <= (canvasHeight * globalPixelSize); j+=globalPixelSize){
                     g2d.drawLine(xPanel, j, xPanel + (canvasWidth * globalPixelSize), j);
                 }
+                g2d.setColor(currentColour);
             }
         };
         this.canvasPanel.setSize(this.canvasWidth * this.globalPixelSize, this.canvasHeight * this.globalPixelSize);
@@ -155,13 +158,20 @@ public class Canvas {
                     switch (currentCanvasMode){
                         case 0:
                             pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
-                            canvasPanel.repaint(); 
+                            canvasPanel.repaint();
                             break;
                         case 1:
                             pixels[indexY][indexX].setPixelColour(Color.WHITE);
                             canvasPanel.repaint(); 
                             break;
                         case 2: //colourpicker
+                            currentColour = pixels[indexY][indexX].getPixelColour();
+                            if (volatileColourIndex < 8){
+                                volatileColourPalette[volatileColourIndex] = currentColour;
+                                volatileColourIndex++;
+                                if (volatileColourIndex == 8){volatileColourIndex = 0;}
+                                volatilePanel.repaint();
+                            }
                             break;
                         case 3: //bucketfill
                             Color replacedColour = pixels[indexY][indexX].getPixelColour();
@@ -197,13 +207,13 @@ public class Canvas {
                             pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
                             midpoint = canvasWidth / 2;
                             if (canvasWidth % 2 == 0) {
-                                // Even width canvas
+                                //even width canvas
                                 if (indexX < midpoint) {
                                     mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
                                     pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
                                 }
                             } else {
-                                // Odd width canvas
+                                //odd width canvas
                                 if (indexX < midpoint) {
                                     mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
                                     pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
@@ -255,7 +265,8 @@ public class Canvas {
                                 pixels[indexY][indexX].setPixelColour(Color.WHITE);
                                 canvasPanel.repaint(); 
                                 break;
-                            case 2: //colourpicker
+                            case 2: //colourpicker //NOT REALLY NEEDED AS WHO WOULD DRAG A COLOUR PICKER?!
+                                currentColour = pixels[indexY][indexX].getPixelColour();
                                 break;
                             case 3: //bucketfill
                                 break;
@@ -286,13 +297,11 @@ public class Canvas {
                                 pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
                                 midpoint = canvasWidth / 2;
                                 if (canvasWidth % 2 == 0) {
-                                    // Even width canvas
                                     if (indexX < midpoint) {
                                         mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
                                         pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
                                     }
                                 } else {
-                                    // Odd width canvas
                                     if (indexX < midpoint) {
                                         mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
                                         pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
@@ -328,20 +337,6 @@ public class Canvas {
         });
     }
     
-    //the canvas grid
-    // private void drawCanvas(Graphics2D g2d){
-    //vertical lines
-    // grid = new Line[canvasHeight + canvasWidth];
-    // int index = 0;
-    //     for (int i = xPanel; i <= (canvasWidth * globalPixelSize); i+=globalPixelSize){
-    //         g2d.drawLine(i, yPanel, i, yPanel + (canvasHeight * globalPixelSize));
-    //     }
-    //     //horizontal lines
-    //     for (int j = yPanel; j <= (canvasHeight * globalPixelSize); j+=globalPixelSize){
-    //         g2d.drawLine(xPanel, j, xPanel + (canvasWidth * globalPixelSize), j);
-    //     }
-    // }
-
     public void createMouseLabel(){
         this.mouseLocation = new JLabel("0 : 0");
         this.mouseLocation.setSize(100,50);
@@ -381,10 +376,11 @@ public class Canvas {
     public void undoAction(String action){
     }
 
+    //flood fill algorithm for bucket fill tool
     private void depthFirstSearch(int indexY, int indexX, Color replacedColour){
         if ((indexY >= canvasHeight) || (indexX >= canvasWidth) || (indexY < 0) || (indexX < 0)){
             return;
-        } else if (!replacedColour.equals(pixels[indexY][indexX].getPixelColour())) {
+        } else if (!replacedColour.equals(pixels[indexY][indexX].getPixelColour())){
             return;
         } else {
             pixels[indexY][indexX].setPixelColour(currentColour);
@@ -401,5 +397,35 @@ public class Canvas {
                 pixels[i][j] = new Pixel(j * globalPixelSize, i * globalPixelSize, globalPixelSize, Color.WHITE);
             }
         }
-    } 
+    }
+
+    public void setBrushSize(int brushSize){this.brushSize = brushSize;}
+
+    public void setCurrentColour(Color newColour){
+        this.currentColour = newColour;
+
+    }
+
+    private void createVolatilePalette(){
+        volatilePanel = new JPanel(null){
+            @Override
+            public void paintComponent(Graphics g){
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D)g;
+                g2d.setClip(0,0,200,100);
+                int index = 0;
+                for (int i = 0; i < 200; i+=25){
+                    g2d.setColor(volatileColourPalette[index]);
+                    g2d.drawRect(i, 0, 25, 25);
+                    g2d.fillRect(i, 0, 25, 25);
+                    index++;
+                }
+            }
+        };
+        volatilePanel.setSize(200,100);
+    }
+
+    public JPanel getVolatilePanel(){return this.volatilePanel;}
+
+    public JPanel getColourPalette(){return this.palettePanel;} 
 }

@@ -163,22 +163,92 @@ public class GUI extends JFrame {
         left.add(zoomOutTool);
     }
 
+    //TEMPORARY MOUSELISTENERS IN THIS CLASS
     public void addRightButtons(JPanel right){
         JLabel mouse = blankCanvas.getMouseLabel();
         mouse.setBounds(0, 700, 200, 100);
         
-        JPanel miniMap = new JPanel();
-        miniMap.setBackground(Color.RED);
-        miniMap.setBounds(0,0,200,200);
+        // JPanel miniMap = new JPanel();
+        // miniMap.setBackground(Color.RED);
+        // miniMap.setBounds(0,0,200,200);
         
+        JSlider redSlider = new JSlider(0,255,128);
+        redSlider.setBounds(0,0,200,50);
+
+        JSlider greenSlider = new JSlider(0,255,128);
+        greenSlider.setBounds(0,50,200,50);
+
+        JSlider blueSlider = new JSlider(0,255,128);
+        blueSlider.setBounds(0,100,200,50);
+
         JPanel colourPalette = new JPanel();
         colourPalette.setBackground(Color.GREEN);
         colourPalette.setBounds(0,200,200,100);
+        colourPalette.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                int red = redSlider.getValue();
+                int green = greenSlider.getValue();
+                int blue = blueSlider.getValue();
+                blankCanvas.setCurrentColour(new Color(red, green, blue));
+                System.out.println(red + " , " + green + " , " + blue);
+            }            
+        });
 
-        right.add(colourPalette);
-        right.add(miniMap);
-        right.add(mouse);
+        JPanel palette = blankCanvas.getVolatilePanel();
+        palette.setBounds(0,150,200,100);
         
+        JPanel brushSize1 = new JPanel();
+        brushSize1.setBackground(new Color(250, 0 , 0));
+        brushSize1.setBounds(0,400,50,50);
+        brushSize1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                blankCanvas.setBrushSize(1);
+            }            
+        });
+
+        JPanel brushSize2 = new JPanel();
+        brushSize2.setBackground(new Color(200, 0 , 0));
+        brushSize2.setBounds(50,400,50,50);
+        brushSize2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                blankCanvas.setBrushSize(2);
+            }
+        });
+
+        JPanel brushSize3 = new JPanel();
+        brushSize3.setBackground(new Color(150, 0 , 0));
+        brushSize3.setBounds(100,400,50,50);
+        brushSize3.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                blankCanvas.setBrushSize(3);
+            }            
+        });
+
+        JPanel brushSize4 = new JPanel();
+        brushSize4.setBackground(new Color(100, 0 , 0));
+        brushSize4.setBounds(150,400,50,50);
+        brushSize4.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                blankCanvas.setBrushSize(4);
+            }            
+        });
+
+        right.add(palette);
+        right.add(redSlider);
+        right.add(greenSlider);
+        right.add(blueSlider);
+        right.add(colourPalette);
+        right.add(mouse);
+        right.add(brushSize1);
+        right.add(brushSize2);
+        right.add(brushSize3);
+        right.add(brushSize4);
+
     }
 
     private void addActionListeners(){
