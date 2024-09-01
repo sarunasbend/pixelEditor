@@ -219,45 +219,48 @@ public class GUI extends JFrame {
         // JPanel palette = blankCanvas.getVolatilePanel();
         // palette.setBounds(0,150,200,100);
         
-        // JPanel brushSize1 = new JPanel();
-        // brushSize1.setBackground(new Color(250, 0 , 0));
-        // brushSize1.setBounds(0,400,50,50);
-        // brushSize1.addMouseListener(new MouseAdapter() {
-        //     @Override
-        //     public void mouseClicked(MouseEvent event){
-        //         blankCanvas.setBrushSize(1);
-        //     }            
-        // });
+        JPanel brushSize1 = new JPanel();
+        brushSize1.setBackground(new Color(250, 0 , 0));
+        brushSize1.setBounds(0,400,50,50);
+        brushSize1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                System.out.println("1");
+                blankCanvas.setBrushSize(1);
+            }            
+        });
 
-        // JPanel brushSize2 = new JPanel();
-        // brushSize2.setBackground(new Color(200, 0 , 0));
-        // brushSize2.setBounds(50,400,50,50);
-        // brushSize2.addMouseListener(new MouseAdapter() {
-        //     @Override
-        //     public void mouseClicked(MouseEvent event){
-        //         blankCanvas.setBrushSize(2);
-        //     }
-        // });
+        JPanel brushSize2 = new JPanel();
+        brushSize2.setBackground(new Color(200, 0 , 0));
+        brushSize2.setBounds(50,400,50,50);
+        brushSize2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                System.out.println("2");
+                blankCanvas.setBrushSize(2);
+            }
+        });
 
-        // JPanel brushSize3 = new JPanel();
-        // brushSize3.setBackground(new Color(150, 0 , 0));
-        // brushSize3.setBounds(100,400,50,50);
-        // brushSize3.addMouseListener(new MouseAdapter() {
-        //     @Override
-        //     public void mouseClicked(MouseEvent event){
-        //         blankCanvas.setBrushSize(3);
-        //     }            
-        // });
+        JPanel brushSize3 = new JPanel();
+        brushSize3.setBackground(new Color(150, 0 , 0));
+        brushSize3.setBounds(100,400,50,50);
+        brushSize3.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                System.out.println("3");
+                blankCanvas.setBrushSize(3);
+            }            
+        });
 
-        // JPanel brushSize4 = new JPanel();
-        // brushSize4.setBackground(new Color(100, 0 , 0));
-        // brushSize4.setBounds(150,400,50,50);
-        // brushSize4.addMouseListener(new MouseAdapter() {
-        //     @Override
-        //     public void mouseClicked(MouseEvent event){
-        //         blankCanvas.setBrushSize(4);
-        //     }            
-        // });
+        JPanel brushSize4 = new JPanel();
+        brushSize4.setBackground(new Color(100, 0 , 0));
+        brushSize4.setBounds(150,400,50,50);
+        brushSize4.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                blankCanvas.setBrushSize(4);
+            }            
+        });
 
         // right.add(palette);
         right.add(redSlider);
@@ -267,10 +270,10 @@ public class GUI extends JFrame {
         right.add(remove);
         right.add(colourPalette);
         right.add(mouse);
-        // right.add(brushSize1);
-        // right.add(brushSize2);
-        // right.add(brushSize3);
-        // right.add(brushSize4);
+        right.add(brushSize1);
+        right.add(brushSize2);
+        right.add(brushSize3);
+        right.add(brushSize4);
 
     }
 

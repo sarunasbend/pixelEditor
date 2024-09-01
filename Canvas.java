@@ -115,31 +115,43 @@ public class Canvas {
                     }
                     if ((mouseMoveY/globalPixelSize < canvasHeight) && (mouseMoveX/globalPixelSize < canvasWidth)){
                         if (pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize] != null){
-                            Rectangle temp = pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize].getRectangle();
+                            Rectangle temp = pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize].getRectangle();                            
+                            Rectangle hover;
+                            switch (brushSize){
+                                case 1:
+                                    hover = new Rectangle(temp.x, temp.y, temp.width, temp.height);
+                                    break;
+                                case 2:
+                                    hover = new Rectangle(temp.x, temp.y, temp.width * 2, temp.height * 2);
+                                    break;
+                                case 3:
+                                    hover = new Rectangle(temp.x - globalPixelSize, temp.y - globalPixelSize, temp.width * 3, temp.height * 3);
+                                    break;
+                                case 4:
+                                    hover = new Rectangle(temp.x - globalPixelSize, temp.y - globalPixelSize, temp.width * 4, temp.height * 4);
+                                    break;
+                                default:
+                                    hover = null;
+                                    break;
+                            }
                             g2d.setColor(Color.RED);
-                            g2d.drawRect(temp.x, temp.y, temp.width, temp.height);
+                            g2d.drawRect(hover.x, hover.y, hover.width, hover.height);
                             g2d.setColor(transparentColour);
-                            g2d.fillRect(temp.x, temp.y, temp.width, temp.height);
-                            g2d.setColor(currentColour);
-                        } else if (((xPanel <= mouseMoveX) && (mouseMoveX <= canvasWidth * globalPixelSize)) && ((yPanel <= mouseMoveY) && (mouseMoveY <= canvasHeight * globalPixelSize))){
-                            g2d.setColor(Color.RED);
-                            g2d.drawRect(hoverRectangle.x, hoverRectangle.y, hoverRectangle.width, hoverRectangle.height);
-                            g2d.setColor(transparentColour);
-                            g2d.fillRect(hoverRectangle.x, hoverRectangle.y, hoverRectangle.width, hoverRectangle.height);
+                            g2d.fillRect(hover.x, hover.y, hover.width, hover.height);
                             g2d.setColor(currentColour);
                         }
                     }
                 }
-                // int index = 0;
-                for (int i = xPanel; i <= (canvasWidth * globalPixelSize); i+=globalPixelSize){
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawLine(i, yPanel, i, yPanel + (canvasHeight * globalPixelSize));
-                }
-                //horizontal lines
-                for (int j = yPanel; j <= (canvasHeight * globalPixelSize); j+=globalPixelSize){
-                    g2d.drawLine(xPanel, j, xPanel + (canvasWidth * globalPixelSize), j);
-                }
-                g2d.setColor(currentColour);
+                // // int index = 0;
+                // for (int i = xPanel; i <= (canvasWidth * globalPixelSize); i+=globalPixelSize){
+                //     g2d.setColor(Color.BLACK);
+                //     g2d.drawLine(i, yPanel, i, yPanel + (canvasHeight * globalPixelSize));
+                // }
+                // //horizontal lines
+                // for (int j = yPanel; j <= (canvasHeight * globalPixelSize); j+=globalPixelSize){
+                //     g2d.drawLine(xPanel, j, xPanel + (canvasWidth * globalPixelSize), j);
+                // }
+                // g2d.setColor(currentColour);
             }
         };
         this.canvasPanel.setSize(this.canvasWidth * this.globalPixelSize, this.canvasHeight * this.globalPixelSize);
@@ -157,10 +169,24 @@ public class Canvas {
                     switch (currentCanvasMode){
                         case 0:
                             pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                            if (brushSize == 2){
+                                brushTwo(indexY, indexX, currentColour);
+                            } else if (brushSize == 3){
+                                brushThree(indexY, indexX, currentColour);
+                            } else if (brushSize == 4){
+                                brushFour(indexY, indexX, currentColour);
+                            }
                             canvasPanel.repaint();
                             break;
                         case 1:
                             pixels[indexY][indexX].setPixelColour(Color.WHITE);
+                            if (brushSize == 2){
+                                brushTwo(indexY, indexX, Color.WHITE);
+                            } else if (brushSize == 3){
+                                brushThree(indexY, indexX, Color.WHITE);
+                            } else if (brushSize == 4){
+                                brushFour(indexY, indexX, Color.WHITE);
+                            }
                             canvasPanel.repaint(); 
                             break;
                         case 2: //colourpicker
@@ -258,10 +284,24 @@ public class Canvas {
                         switch (currentCanvasMode){
                             case 0: //pen
                                 pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                if (brushSize == 2){
+                                    brushTwo(indexY, indexX, currentColour);
+                                } else if (brushSize == 3){
+                                    brushThree(indexY, indexX, currentColour);
+                                } else if (brushSize == 4){
+                                    brushFour(indexY, indexX, currentColour);
+                                }
                                 canvasPanel.repaint();
                                 break;
                             case 1: //eraser
                                 pixels[indexY][indexX].setPixelColour(Color.WHITE);
+                                if (brushSize == 2){
+                                    brushTwo(indexY, indexX, Color.WHITE);
+                                } else if (brushSize == 3){
+                                    brushThree(indexY, indexX, Color.WHITE);
+                                } else if (brushSize == 4){
+                                    brushFour(indexY, indexX, Color.WHITE);
+                                }
                                 canvasPanel.repaint(); 
                                 break;
                             case 2: //colourpicker //NOT REALLY NEEDED AS WHO WOULD DRAG A COLOUR PICKER?!
@@ -334,6 +374,45 @@ public class Canvas {
                 canvasPanel.repaint(); //so that it is consistently updated
             }
         });
+    }
+
+    private void brushTwo(int y, int x, Color paintColour){
+        if (x + 1 < canvasWidth){pixels[y][x + 1] = new Pixel((x + 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);}
+        if (y + 1 < canvasHeight){pixels[y + 1][x] = new Pixel(x * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if ((x + 1 < canvasWidth) && (y + 1 < canvasHeight)){pixels[y + 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
+    }
+
+    private void brushThree(int y, int x, Color paintColour){
+        if ((y - 1 >= 0) && (x - 1 >= 0)){pixels[y - 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if (y - 1 >= 0){pixels[y - 1][x] = new Pixel(x * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if ((y - 1 >= 0) && (x + 1 < canvasWidth)){pixels[y - 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if (x - 1 >= 0){pixels[y][x - 1] = new Pixel((x - 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);}
+        if (x + 1 < canvasWidth){pixels[y][x + 1] = new Pixel((x + 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);}
+        if ((y + 1 < canvasHeight) && (x - 1 >= 0)){pixels[y + 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if (y + 1 < canvasHeight){pixels[y + 1][x] = new Pixel(x * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if ((x + 1 < canvasWidth) && (y + 1 < canvasHeight)){pixels[y + 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
+    }
+
+    private void brushFour(int y, int x, Color paintColour){
+        if ((y - 1 >= 0) && (x - 1 >= 0)){pixels[y - 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if (y - 1 >= 0){pixels[y - 1][x] = new Pixel(x * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if ((y - 1 >= 0) && (x + 1 < canvasWidth)){pixels[y - 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if ((y - 1 >= 0) && (x + 2 < canvasWidth)){pixels[y - 1][x + 2] = new Pixel((x + 2) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);}
+
+        if (x - 1 >= 0){pixels[y][x - 1] = new Pixel((x - 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);}
+        if (x + 1 < canvasWidth){pixels[y][x + 1] = new Pixel((x + 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);}
+        if (x + 2 < canvasWidth){pixels[y][x + 2] = new Pixel((x + 2) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);}
+
+        if ((x + 1 < canvasWidth) && (y + 1 < canvasHeight)){pixels[y + 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if (y + 1 < canvasHeight){pixels[y + 1][x] = new Pixel(x * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if ((y + 1 < canvasHeight) && (x - 1 >= 0)){pixels[y + 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if ((x + 2 < canvasWidth) && (y + 1 < canvasHeight)){pixels[y + 1][x + 2] = new Pixel((x + 2) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
+
+        if ((x + 1 < canvasWidth) && (y + 2 < canvasHeight)){pixels[y + 2][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);}
+        if (y + 2 < canvasHeight){pixels[y + 2][x] = new Pixel(x * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);}
+        if ((y + 2 < canvasHeight) && (x - 1 >= 0)){pixels[y + 2][x - 1] = new Pixel((x - 1) * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);}
+        if ((x + 2 < canvasWidth) && (y + 2 < canvasHeight)){pixels[y + 2][x + 2] = new Pixel((x + 2) * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);}
+
     }
     
     public void createMouseLabel(){
@@ -480,9 +559,9 @@ public class Canvas {
                 int y = e.getY() / 25;
                 int index = (y == 0) ? x : x + 8;
                 if (permanentColourPalette[index] != null ){setCurrentColour(permanentColourPalette[index]);};
-            }            
+            }
         });
     }
 
-    public JPanel getColourPalette(){return this.palettePanel;} 
+    public JPanel getColourPalette(){return this.palettePanel;}
 }
