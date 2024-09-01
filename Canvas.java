@@ -73,8 +73,6 @@ public class Canvas {
     private boolean isMouseHeldDown = false;
     private Rectangle hoverRectangle;
 
-
-
     //blank canvas constructor
     //pixel size is determined before the creation of the program
     public Canvas(int xP, int yP, int pS, int cW, int cH){
@@ -90,6 +88,7 @@ public class Canvas {
         createPixelCanvas();
         createMouseLabel();  
         createVolatilePalette();
+        createPermanentPalette();
         canvasPanel.repaint();
     }
 
@@ -403,7 +402,33 @@ public class Canvas {
 
     public void setCurrentColour(Color newColour){
         this.currentColour = newColour;
+    }
 
+    public void addToPermanentPalette(Color colour){
+        for (int i = 0; i < 16; i++){
+            if (permanentColourPalette[i] == null){
+                permanentColourPalette[i] = colour;
+                palettePanel.repaint();
+                break;
+            } else {
+                if (permanentColourPalette[i].equals(colour)){
+                    break;
+                }
+            }
+        }
+    }
+
+    public void removeFromPermanentPalette(){
+        for (int i = 0; i < 16; i++){
+            if (permanentColourPalette[i] != null){
+               if (permanentColourPalette[i].equals(currentColour)){
+                    permanentColourPalette[i] = null;
+                    palettePanel.repaint();
+                    break;
+                } 
+            }
+        
+        }
     }
 
     private void createVolatilePalette(){
@@ -412,7 +437,7 @@ public class Canvas {
             public void paintComponent(Graphics g){
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D)g;
-                g2d.setClip(0,0,200,100);
+                g2d.setClip(0,0,200,25);
                 int index = 0;
                 for (int i = 0; i < 200; i+=25){
                     g2d.setColor(volatileColourPalette[index]);
@@ -422,10 +447,42 @@ public class Canvas {
                 }
             }
         };
-        volatilePanel.setSize(200,100);
+        volatilePanel.setSize(200,25);
     }
 
     public JPanel getVolatilePanel(){return this.volatilePanel;}
+
+    private void createPermanentPalette(){
+        palettePanel = new JPanel(null){
+            @Override
+            public void paintComponent(Graphics g){
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D)g;
+                int index = 0;
+                for (int i = 0; i < 50; i+=25){
+                    for (int j = 0; j < 200; j+=25){
+                        if (permanentColourPalette[index] != null){
+                            g2d.setColor(permanentColourPalette[index]);
+                            g2d.drawRect(j, i, 25, 25);
+                            g2d.fillRect(j, i, 25, 25);
+                            g2d.setColor(Color.WHITE);
+                            index++;
+                        }
+                    }
+                }
+            }
+        };
+
+        palettePanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e){
+                int x = e.getX() / 25;
+                int y = e.getY() / 25;
+                int index = (y == 0) ? x : x + 8;
+                if (permanentColourPalette[index] != null ){setCurrentColour(permanentColourPalette[index]);};
+            }            
+        });
+    }
 
     public JPanel getColourPalette(){return this.palettePanel;} 
 }
