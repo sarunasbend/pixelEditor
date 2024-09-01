@@ -416,12 +416,12 @@ public class Canvas {
     }
     
     public void createMouseLabel(){
-        this.mouseLocation = new JLabel("0 : 0");
+        this.mouseLocation = new JLabel("[ 0 : 0 ]");
         this.mouseLocation.setSize(100,50);
     }
 
     public void setMouseLocationText(int mouseX, int mouseY){
-        this.mouseLocation.setText(mouseX + " : " + mouseY);
+        this.mouseLocation.setText("[ " + mouseX + " : " + mouseY + " ]");
     }
 
     public JPanel getCanvas(){return this.canvasPanel;}

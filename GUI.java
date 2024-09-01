@@ -17,6 +17,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.IOException;
 
 public class GUI extends JFrame {
     private Canvas blankCanvas;
@@ -166,7 +168,16 @@ public class GUI extends JFrame {
     //TEMPORARY MOUSELISTENERS IN THIS CLASS
     public void addRightButtons(JPanel right){
         JLabel mouse = blankCanvas.getMouseLabel();
-        mouse.setBounds(0, 700, 200, 100);
+        mouse.setBounds(50, 700, 150, 100);
+
+        try {
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("components/resources/CustomFont.ttf"));
+            customFont = customFont.deriveFont(24f);
+            mouse.setFont(customFont);
+            mouse.setForeground(Color.YELLOW);
+        } catch (FontFormatException | IOException e){
+            e.printStackTrace();
+        }
         
         // JPanel miniMap = new JPanel();
         // miniMap.setBackground(Color.RED);
