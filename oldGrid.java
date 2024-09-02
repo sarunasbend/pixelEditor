@@ -24,7 +24,7 @@ import java.util.ArrayList;
 */
 
 
-public class Grid {
+public class oldGrid {
     public class Pixel{
         private Color pixelColour;
         private Rectangle rectangle;
@@ -62,7 +62,7 @@ public class Grid {
     private boolean yMirror = false;
 
     //initialises a blank canvas
-    public Grid(int xPanel, int yPanel, int pixelSize, int gridWidth, int gridHeight){
+    public oldGrid(int xPanel, int yPanel, int pixelSize, int gridWidth, int gridHeight){
         this.xPanel = xPanel;
         this.yPanel = yPanel;
         this.pixelSize = pixelSize;
@@ -73,7 +73,7 @@ public class Grid {
     }
 
     //initialises an image canvas
-    public Grid(Image importedImage, int xPanel, int yPanel, int pixelSize, int gridWidth, int gridHeight){
+    public oldGrid(Image importedImage, int xPanel, int yPanel, int pixelSize, int gridWidth, int gridHeight){
         this.importedImage = importedImage;
         this.xPanel = xPanel;
         this.yPanel = yPanel;

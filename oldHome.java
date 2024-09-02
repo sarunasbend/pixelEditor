@@ -10,18 +10,16 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import components.HomePanel;
-
 import javax.swing.JLabel;
 import java.awt.*;
 
-public class Home extends JFrame {
-    private HomePanel tempName;
+public class oldHome extends JFrame {
+    // private HomePanel tempName;
     private JPanel PhotoPanel;
 
-    public Home(){
-        this.tempName = new HomePanel(0, 0, 0, 0);
-        this.PhotoPanel = tempName.getHomePanel();
+    public oldHome(){
+        // this.tempName = new HomePanel(0, 0, 0, 0);
+        // this.PhotoPanel = tempName.getHomePanel();
         initFrame();
     }
 
@@ -39,7 +37,7 @@ public class Home extends JFrame {
     private GUI temp;
 
     private void createPixel(){
-        this.temp = new GUI();
+        // this.temp = new GUI();
         dispose();
     }
 }
