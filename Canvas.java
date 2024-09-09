@@ -13,6 +13,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.util.Stack;
 
 public class Canvas {
     public class Pixel {
@@ -73,9 +75,8 @@ public class Canvas {
     private boolean isMouseHeldDown = false;
     private Rectangle hoverRectangle;
 
-    private UndoStack undoStack; //tracks the last N actions that have altered the canvas
-
-    private String temp;
+    private Stack<String> undoStack; //tracks the last N actions that have altered the canvas
+    private ArrayList<String> currentAction; //tracks the current action being performed, adds to top of stack at end of action
 
     //blank canvas constructor
     //pixel size is determined before the creation of the program
@@ -87,8 +88,10 @@ public class Canvas {
         canvasHeight = cH;
         this.pixels = new Pixel[canvasHeight][canvasWidth]; //height and width is the resolution
         this.permanentColourPalette = new Color[16]; //palette is able to store 16 colours
-        this.volatileColourPalette = new Color[8]; //last 6 colour picked 
-        this.undoStack = new UndoStack("");
+        this.volatileColourPalette = new Color[8]; //last 6 colour picked
+        this.undoStack = new Stack<>();
+        this.undoStack.setSize(20);
+        this.currentAction = new ArrayList<>();
         initPixels();
         createPixelCanvas();
         createMouseLabel();  
@@ -164,6 +167,7 @@ public class Canvas {
             @Override
             public void mousePressed(MouseEvent event){
                 isMouseHeldDown = true;
+                currentAction.add(Integer.toString(currentCanvasMode));
                 mouseClickX = mouseMoveX = ((event.getX() / globalPixelSize) * globalPixelSize);
                 mouseClickY = mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
                 int indexX = mouseClickX / globalPixelSize;
@@ -174,6 +178,9 @@ public class Canvas {
                     switch (currentCanvasMode){
                         case 0:
                             pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                            if (!currentAction.get(currentAction.size() - 1).equals(indexX + ":" + indexY + ",")){
+                                currentAction.add(indexX + ":" + indexY + ",");
+                            }
                             if (brushSize == 2){
                                 brushTwo(indexY, indexX, currentColour);
                             } else if (brushSize == 3){
@@ -326,6 +333,7 @@ public class Canvas {
             @Override
             public void mouseReleased(MouseEvent event){
                 isMouseHeldDown = false;
+                pushToStack();
             }
         });
 
@@ -344,6 +352,9 @@ public class Canvas {
                         int midpoint;
                         switch (currentCanvasMode){
                             case 0: //pen
+                                if (!currentAction.get(currentAction.size() - 1).equals(indexX + ":" + indexY + ",")){ //prevents multiple additions of same action
+                                    currentAction.add(indexX + ":" + indexY + ",");
+                                }
                                 pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
                                 if (brushSize == 2){
                                     brushTwo(indexY, indexX, currentColour);
@@ -356,6 +367,9 @@ public class Canvas {
                                 break;
                             case 1: //eraser
                                 pixels[indexY][indexX].setPixelColour(Color.WHITE);
+                                if (!currentAction.get(currentAction.size() - 1).equals(indexX + ":" + indexY + ",")){ //prevents multiple additions of same action
+                                    currentAction.add(indexX + ":" + indexY + ",");
+                                }
                                 if (brushSize == 2){
                                     brushTwo(indexY, indexX, Color.WHITE);
                                 } else if (brushSize == 3){
@@ -376,6 +390,9 @@ public class Canvas {
                                 break;
                             case 6: //xmirror
                                 pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                if (!currentAction.get(currentAction.size() - 1).equals(indexX + ":" + indexY + ",")){ //prevents multiple additions of same action
+                                    currentAction.add(indexX + ":" + indexY + ",");
+                                }
                                 if (brushSize == 2){
                                     brushTwo(indexY, indexX, currentColour);
                                 } else if (brushSize == 3){
@@ -423,6 +440,9 @@ public class Canvas {
                                 break;
                             case 7: //xmirror   
                                 pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                if (!currentAction.get(currentAction.size() - 1).equals(indexX + ":" + indexY + ",")){ //prevents multiple additions of same action
+                                    currentAction.add(indexX + ":" + indexY + ",");
+                                }
                                 if (brushSize == 2){
                                     brushTwo(indexY, indexX, currentColour);
                                 } else if (brushSize == 3){
@@ -686,20 +706,19 @@ public class Canvas {
 
     //called upon deletion closure of the JFrame.
     public void deleteUndoStack(){
-        undoStack.deleteUndoStack();
     }
 
     private void undoAction(){
-        String poppedAction = undoStack.popUndoStack();
-        if (poppedAction.substring(0,1).equals("0")){
+        // String poppedAction = undoStack.popUndoStack();
+        // if (poppedAction.substring(0,1).equals("0")){
             
-        } else if (poppedAction.substring(0,1).equals("1")){
+        // } else if (poppedAction.substring(0,1).equals("1")){
             
-        } else if (poppedAction.substring(0,1).equals("1")){
+        // } else if (poppedAction.substring(0,1).equals("1")){
         
-        } else if (poppedAction.substring(0,1).equals("1")){
+        // } else if (poppedAction.substring(0,1).equals("1")){
         
-        }
+        // }
     }
 
     private void redoAction(){
@@ -723,10 +742,25 @@ public class Canvas {
      * these are the current tool i want to implment
      */
     private void pushToStack(){
-
+        String action = currentAction.getFirst() + ";";
+        for (int i = 1; i < currentAction.size(); i++){
+            action = action + currentAction.get(i);
+        }
+        // System.out.println(temp);
+        undoStack.push(action);
+        printStack();
+        currentAction.clear();
     }
 
     public void setGlobalPixel(int size){
         this.globalPixelSize = size;
+    }
+
+    //TEMPORARY METHOD TO CHECK FUNCTIONALITY
+    private void printStack(){
+        for (String x : undoStack){
+            System.out.println(x);
+        }
+        System.out.println();
     }
 }
