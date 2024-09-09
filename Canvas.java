@@ -211,40 +211,96 @@ public class Canvas {
                             break;
                         case 6: //xmirror
                             pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                            if (brushSize == 2){
+                                brushTwo(indexY, indexX, currentColour);
+                            } else if (brushSize == 3){
+                                brushThree(indexY, indexX, currentColour);
+                            } else if (brushSize == 4){
+                                brushFour(indexY, indexX, currentColour);
+                            }
                             midpoint = canvasHeight / 2;
                             if (canvasHeight % 2 == 0){
                                 if (indexY < midpoint){
                                     mouseClickY = (canvasHeight * globalPixelSize) - mouseClickY - globalPixelSize;
                                     pixels[canvasHeight - 1 - indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    if (brushSize == 2){
+                                        brushTwo(canvasHeight - 1 - indexY, indexX, currentColour);
+                                    } else if (brushSize == 3){
+                                        brushThree(canvasHeight - 1 - indexY, indexX, currentColour);
+                                    } else if (brushSize == 4){
+                                        brushFour(canvasHeight - 1 - indexY, indexX, currentColour);
+                                    }
                                 }
                             } else {
                                 if (indexY < midpoint){
                                     mouseClickY = (canvasHeight * globalPixelSize) - mouseClickY - globalPixelSize;
                                     pixels[canvasHeight - 1 - indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    if (brushSize == 2){
+                                        brushTwo(canvasHeight - 1 - indexY, indexX, currentColour);
+                                    } else if (brushSize == 3){
+                                        brushThree(canvasHeight - 1 - indexY, indexX, currentColour);
+                                    } else if (brushSize == 4){
+                                        brushFour(canvasHeight - 1 - indexY, indexX, currentColour);
+                                    }
                                 } else if (indexY > midpoint){
                                     mouseClickY = (canvasHeight - 1 - indexY) * globalPixelSize;
                                     pixels[midpoint - (indexY - midpoint)][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    if (brushSize == 2){
+                                        brushTwo(midpoint - (indexY - midpoint), indexX, currentColour);
+                                    } else if (brushSize == 3){
+                                        brushThree(midpoint - (indexY - midpoint), indexX, currentColour);
+                                    } else if (brushSize == 4){
+                                        brushFour(midpoint - (indexY - midpoint), indexX, currentColour);
+                                    }
                                 }
                             }
                             canvasPanel.repaint();
                             break;
                         case 7: //ymirror
                             pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                            if (brushSize == 2){
+                                brushTwo(indexY, indexX, currentColour);
+                            } else if (brushSize == 3){
+                                brushThree(indexY, indexX, currentColour);
+                            } else if (brushSize == 4){
+                                brushFour(indexY, indexX, currentColour);
+                            }
                             midpoint = canvasWidth / 2;
                             if (canvasWidth % 2 == 0) {
                                 //even width canvas
                                 if (indexX < midpoint) {
                                     mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
                                     pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    if (brushSize == 2){
+                                        brushTwo(indexY, canvasWidth - 1 - indexX, currentColour);
+                                    } else if (brushSize == 3){
+                                        brushThree(indexY, canvasWidth - 1 - indexX, currentColour);
+                                    } else if (brushSize == 4){
+                                        brushFour(indexY, canvasWidth - 1 - indexX, currentColour);
+                                    }
                                 }
                             } else {
                                 //odd width canvas
                                 if (indexX < midpoint) {
                                     mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
                                     pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    if (brushSize == 2){
+                                        brushTwo(indexY, canvasWidth - 1 - indexX, currentColour);
+                                    } else if (brushSize == 3){
+                                        brushThree(indexY, canvasWidth - 1 - indexX, currentColour);
+                                    } else if (brushSize == 4){
+                                        brushFour(indexY, canvasWidth - 1 - indexX, currentColour);
+                                    }
                                 } else if (indexX > midpoint) {
                                     mouseClickX = (canvasWidth - 1 - indexX) * globalPixelSize;
                                     pixels[indexY][midpoint - (indexX - midpoint)] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    if (brushSize == 2){
+                                        brushTwo(indexY, midpoint - (indexX - midpoint), currentColour);
+                                    } else if (brushSize == 3){
+                                        brushThree(indexY, midpoint - (indexX - midpoint), currentColour);
+                                    } else if (brushSize == 4){
+                                        brushFour(indexY, midpoint - (indexX - midpoint), currentColour);
+                                    }
                                 }
                             }
                             canvasPanel.repaint();
@@ -315,38 +371,96 @@ public class Canvas {
                                 break;
                             case 6: //xmirror
                                 pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                if (brushSize == 2){
+                                    brushTwo(indexY, indexX, currentColour);
+                                } else if (brushSize == 3){
+                                    brushThree(indexY, indexX, currentColour);
+                                } else if (brushSize == 4){
+                                    brushFour(indexY, indexX, currentColour);
+                                }
                                 midpoint = canvasHeight / 2;
                                 if (canvasHeight % 2 == 0){
                                     if (indexY < midpoint){
                                         mouseClickY = (canvasHeight * globalPixelSize) - mouseClickY - globalPixelSize;
                                         pixels[canvasHeight - 1 - indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                        if (brushSize == 2){
+                                            brushTwo(canvasHeight - 1 - indexY, indexX, currentColour);
+                                        } else if (brushSize == 3){
+                                            brushThree(canvasHeight - 1 - indexY, indexX, currentColour);
+                                        } else if (brushSize == 4){
+                                            brushFour(canvasHeight - 1 - indexY, indexX, currentColour);
+                                        }
                                     }
                                 } else {
                                     if (indexY < midpoint){
                                         mouseClickY = (canvasHeight * globalPixelSize) - mouseClickY - globalPixelSize;
                                         pixels[canvasHeight - 1 - indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                        if (brushSize == 2){
+                                            brushTwo(canvasHeight - 1 - indexY, indexX, currentColour);
+                                        } else if (brushSize == 3){
+                                            brushThree(canvasHeight - 1 - indexY, indexX, currentColour);
+                                        } else if (brushSize == 4){
+                                            brushFour(canvasHeight - 1 - indexY, indexX, currentColour);
+                                        }
                                     } else if (indexY > midpoint){
                                         mouseClickY = (canvasHeight - 1 - indexY) * globalPixelSize;
                                         pixels[midpoint - (indexY - midpoint)][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                        if (brushSize == 2){
+                                            brushTwo(midpoint - (indexY - midpoint), indexX, currentColour);
+                                        } else if (brushSize == 3){
+                                            brushThree(midpoint - (indexY - midpoint), indexX, currentColour);
+                                        } else if (brushSize == 4){
+                                            brushFour(midpoint - (indexY - midpoint), indexX, currentColour);
+                                        }
                                     }
                                 }
                                 canvasPanel.repaint();
                                 break;
                             case 7: //xmirror   
                                 pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                if (brushSize == 2){
+                                    brushTwo(indexY, indexX, currentColour);
+                                } else if (brushSize == 3){
+                                    brushThree(indexY, indexX, currentColour);
+                                } else if (brushSize == 4){
+                                    brushFour(indexY, indexX, currentColour);
+                                }
                                 midpoint = canvasWidth / 2;
                                 if (canvasWidth % 2 == 0) {
+                                    //even width canvas
                                     if (indexX < midpoint) {
                                         mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
                                         pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                        if (brushSize == 2){
+                                            brushTwo(indexY, canvasWidth - 1 - indexX, currentColour);
+                                        } else if (brushSize == 3){
+                                            brushThree(indexY, canvasWidth - 1 - indexX, currentColour);
+                                        } else if (brushSize == 4){
+                                            brushFour(indexY, canvasWidth - 1 - indexX, currentColour);
+                                        }
                                     }
                                 } else {
+                                    //odd width canvas
                                     if (indexX < midpoint) {
                                         mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
                                         pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                        if (brushSize == 2){
+                                            brushTwo(indexY, canvasWidth - 1 - indexX, currentColour);
+                                        } else if (brushSize == 3){
+                                            brushThree(indexY, canvasWidth - 1 - indexX, currentColour);
+                                        } else if (brushSize == 4){
+                                            brushFour(indexY, canvasWidth - 1 - indexX, currentColour);
+                                        }
                                     } else if (indexX > midpoint) {
                                         mouseClickX = (canvasWidth - 1 - indexX) * globalPixelSize;
                                         pixels[indexY][midpoint - (indexX - midpoint)] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                        if (brushSize == 2){
+                                            brushTwo(indexY, midpoint - (indexX - midpoint), currentColour);
+                                        } else if (brushSize == 3){
+                                            brushThree(indexY, midpoint - (indexX - midpoint), currentColour);
+                                        } else if (brushSize == 4){
+                                            brushFour(indexY, midpoint - (indexX - midpoint), currentColour);
+                                        }
                                     }
                                 }
                                 canvasPanel.repaint();
