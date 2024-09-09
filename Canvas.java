@@ -73,6 +73,10 @@ public class Canvas {
     private boolean isMouseHeldDown = false;
     private Rectangle hoverRectangle;
 
+    private UndoStack undoStack; //tracks the last N actions that have altered the canvas
+
+    private String temp;
+
     //blank canvas constructor
     //pixel size is determined before the creation of the program
     public Canvas(int xP, int yP, int pS, int cW, int cH){
@@ -84,6 +88,7 @@ public class Canvas {
         this.pixels = new Pixel[canvasHeight][canvasWidth]; //height and width is the resolution
         this.permanentColourPalette = new Color[16]; //palette is able to store 16 colours
         this.volatileColourPalette = new Color[8]; //last 6 colour picked 
+        this.undoStack = new UndoStack("");
         initPixels();
         createPixelCanvas();
         createMouseLabel();  
@@ -678,4 +683,50 @@ public class Canvas {
     }
 
     public JPanel getColourPalette(){return this.palettePanel;}
+
+    //called upon deletion closure of the JFrame.
+    public void deleteUndoStack(){
+        undoStack.deleteUndoStack();
+    }
+
+    private void undoAction(){
+        String poppedAction = undoStack.popUndoStack();
+        if (poppedAction.substring(0,1).equals("0")){
+            
+        } else if (poppedAction.substring(0,1).equals("1")){
+            
+        } else if (poppedAction.substring(0,1).equals("1")){
+        
+        } else if (poppedAction.substring(0,1).equals("1")){
+        
+        }
+    }
+
+    private void redoAction(){
+
+    }
+
+    /*
+     * same as the canvas mode, these are the opcode for the actions taken
+     * 0 - default brush/draw
+     * 1 - eraser
+     * 2 - colour picker
+     * 3 - bucket fill
+     * 4 - redo
+     * 5 - undo
+     * 6 - x-mirror
+     * 7 - y-mirror
+     * 8 - x/y-mirror
+     * 9 - trash 
+     * ...
+     * more to be added
+     * these are the current tool i want to implment
+     */
+    private void pushToStack(){
+
+    }
+
+    public void setGlobalPixel(int size){
+        this.globalPixelSize = size;
+    }
 }

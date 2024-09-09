@@ -81,6 +81,7 @@ public class GUI extends JFrame {
 
     private void addComponents() {
         blankCanvas = new Canvas(0, 0, pixelSize, canvasWidth, canvasHeight);
+        System.out.println(pixelSize);
         JPanel canvas = blankCanvas.getCanvas();
         canvas.setLocation(canvasXPadding, canvasYPadding);
 

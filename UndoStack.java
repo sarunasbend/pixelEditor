@@ -40,12 +40,12 @@ public class UndoStack {
     */
     
     /**
-     * Opcode - ADD
+     * Opcode - 0
      * Operand - Undo last drawn pixel 
-     */
+    */
     public void pushDrawn(int x, int y){
         try (BufferedWriter pusher = new BufferedWriter(new FileWriter(path + "undoStack.txt", true))){
-            pusher.write("ADD " + x + " " + y + " ");
+            pusher.write("0 " + x + " " + y + " ");
             pusher.newLine();
             pusher.close();
         } catch (IOException e){
@@ -54,13 +54,27 @@ public class UndoStack {
     }
 
     /**
-     * Opcode - ERS
-     * Operand - Undo lasst eraser pixel
-     */
-
+     * Opcode - 1
+     * Operand - Undo last eraser pixel
+    */
     public void pushEraser(int x, int y){
         try (BufferedWriter pusher = new BufferedWriter(new FileWriter(path + "undoStack.txt", true))){
-            pusher.write("ERS " + x + " " + y + " ");
+            pusher.write("1 " + x + " " + y + " ");
+            pusher.newLine();
+            pusher.close();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Opcode - 3
+     * Operand - Undo lasst eraser pixel
+    */
+
+    public void pushBucket(int x, int y){
+        try (BufferedWriter pusher = new BufferedWriter(new FileWriter(path + "undoStack.txt", true))){
+            pusher.write("3 " + x + " " + y + " ");
             pusher.newLine();
             pusher.close();
         } catch (IOException e){
@@ -72,7 +86,7 @@ public class UndoStack {
      * Method pops the last pushed line of the undoStack.txt, removes that line and rewrites
      * Very convoluted way of doing this, and I feel like I can implement this much better.
      * Returns NUL if stack is empty
-     */
+    */
     public String popUndoStack(){
         String returnValue = "NUL";
         try (BufferedReader popper = new BufferedReader(new FileReader(path + "undoStack.txt"))){
