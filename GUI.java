@@ -353,6 +353,7 @@ public class GUI extends JFrame {
                 currentCanvasMode = 5;
                 highlightTool();
                 blankCanvas.setCurrentCanvasMode(currentCanvasMode);
+                blankCanvas.undoAction();
             }
         });
 

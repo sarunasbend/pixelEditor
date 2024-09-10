@@ -168,6 +168,7 @@ public class Canvas {
             public void mousePressed(MouseEvent event){
                 isMouseHeldDown = true;
                 currentAction.add(Integer.toString(currentCanvasMode));
+                currentAction.add(Integer.toString(currentColour.getRed()) + ":" + Integer.toString(currentColour.getGreen()) + ":" + Integer.toString(currentColour.getBlue()));
                 mouseClickX = mouseMoveX = ((event.getX() / globalPixelSize) * globalPixelSize);
                 mouseClickY = mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
                 int indexX = mouseClickX / globalPixelSize;
@@ -516,42 +517,121 @@ public class Canvas {
     }
 
     private void brushTwo(int y, int x, Color paintColour){
-        if (x + 1 < canvasWidth){pixels[y][x + 1] = new Pixel((x + 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);}
-        if (y + 1 < canvasHeight){pixels[y + 1][x] = new Pixel(x * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
-        if ((x + 1 < canvasWidth) && (y + 1 < canvasHeight)){pixels[y + 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if (x + 1 < canvasWidth){
+            pixels[y][x + 1] = new Pixel((x + 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x + 1) + ":" + y + ",");
+        }
+        if (y + 1 < canvasHeight){
+            pixels[y + 1][x] = new Pixel(x * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add(x + ":" + (y + 1) + ",");
+        }
+        if ((x + 1 < canvasWidth) && (y + 1 < canvasHeight)){
+            pixels[y + 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x + 1) + ":" + (y + 1) + ",");
+        }
     }
 
     private void brushThree(int y, int x, Color paintColour){
-        if ((y - 1 >= 0) && (x - 1 >= 0)){pixels[y - 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);}
-        if (y - 1 >= 0){pixels[y - 1][x] = new Pixel(x * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);}
-        if ((y - 1 >= 0) && (x + 1 < canvasWidth)){pixels[y - 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);}
-        if (x - 1 >= 0){pixels[y][x - 1] = new Pixel((x - 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);}
-        if (x + 1 < canvasWidth){pixels[y][x + 1] = new Pixel((x + 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);}
-        if ((y + 1 < canvasHeight) && (x - 1 >= 0)){pixels[y + 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
-        if (y + 1 < canvasHeight){pixels[y + 1][x] = new Pixel(x * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
-        if ((x + 1 < canvasWidth) && (y + 1 < canvasHeight)){pixels[y + 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if ((y - 1 >= 0) && (x - 1 >= 0)){
+            pixels[y - 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x - 1) + ":" + (y - 1) + ",");
+        }
+        if (y - 1 >= 0){
+            pixels[y - 1][x] = new Pixel(x * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x) + ":" + (y - 1) + ",");
+
+        }
+        if ((y - 1 >= 0) && (x + 1 < canvasWidth)){
+            pixels[y - 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x + 1) + ":" + (y - 1) + ",");
+        }
+        if (x - 1 >= 0){
+            pixels[y][x - 1] = new Pixel((x - 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x - 1) + ":" + (y) + ",");
+        }
+        if (x + 1 < canvasWidth){
+            pixels[y][x + 1] = new Pixel((x + 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x + 1) + ":" + (y) + ",");
+        }
+        if ((y + 1 < canvasHeight) && (x - 1 >= 0)){
+            pixels[y + 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x - 1) + ":" + (y + 1) + ",");
+        }
+        if (y + 1 < canvasHeight){
+            pixels[y + 1][x] = new Pixel(x * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x) + ":" + (y + 1) + ",");
+        }
+        if ((x + 1 < canvasWidth) && (y + 1 < canvasHeight)){
+            pixels[y + 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x + 1) + ":" + (y + 1) + ",");
+        }
     }
 
     private void brushFour(int y, int x, Color paintColour){
-        if ((y - 1 >= 0) && (x - 1 >= 0)){pixels[y - 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);}
-        if (y - 1 >= 0){pixels[y - 1][x] = new Pixel(x * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);}
-        if ((y - 1 >= 0) && (x + 1 < canvasWidth)){pixels[y - 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);}
-        if ((y - 1 >= 0) && (x + 2 < canvasWidth)){pixels[y - 1][x + 2] = new Pixel((x + 2) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if ((y - 1 >= 0) && (x - 1 >= 0)){
+            pixels[y - 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x - 1) + ":" + (y - 1) + ",");
+        }
+        if (y - 1 >= 0){
+            pixels[y - 1][x] = new Pixel(x * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x) + ":" + (y - 1) + ",");
+        }
+        if ((y - 1 >= 0) && (x + 1 < canvasWidth)){
+            pixels[y - 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x + 1) + ":" + (y - 1) + ",");
+        }
+        if ((y - 1 >= 0) && (x + 2 < canvasWidth)){
+            pixels[y - 1][x + 2] = new Pixel((x + 2) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x + 2) + ":" + (y - 1) + ",");
+        }
 
-        if (x - 1 >= 0){pixels[y][x - 1] = new Pixel((x - 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);}
-        if (x + 1 < canvasWidth){pixels[y][x + 1] = new Pixel((x + 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);}
-        if (x + 2 < canvasWidth){pixels[y][x + 2] = new Pixel((x + 2) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);}
+        if (x - 1 >= 0){
+            pixels[y][x - 1] = new Pixel((x - 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x - 1) + ":" + (y) + ",");
+        }
+        if (x + 1 < canvasWidth){
+            pixels[y][x + 1] = new Pixel((x + 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x + 1) + ":" + (y) + ",");
+        }
+        if (x + 2 < canvasWidth){
+            pixels[y][x + 2] = new Pixel((x + 2) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x + 2) + ":" + (y) + ",");
+        }
 
-        if ((x + 1 < canvasWidth) && (y + 1 < canvasHeight)){pixels[y + 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
-        if (y + 1 < canvasHeight){pixels[y + 1][x] = new Pixel(x * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
-        if ((y + 1 < canvasHeight) && (x - 1 >= 0)){pixels[y + 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
-        if ((x + 2 < canvasWidth) && (y + 1 < canvasHeight)){pixels[y + 1][x + 2] = new Pixel((x + 2) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);}
+        if ((x + 1 < canvasWidth) && (y + 1 < canvasHeight)){
+            pixels[y + 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x + 1) + ":" + (y + 1) + ",");
 
-        if ((x + 1 < canvasWidth) && (y + 2 < canvasHeight)){pixels[y + 2][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);}
-        if (y + 2 < canvasHeight){pixels[y + 2][x] = new Pixel(x * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);}
-        if ((y + 2 < canvasHeight) && (x - 1 >= 0)){pixels[y + 2][x - 1] = new Pixel((x - 1) * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);}
-        if ((x + 2 < canvasWidth) && (y + 2 < canvasHeight)){pixels[y + 2][x + 2] = new Pixel((x + 2) * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);}
+        }
+        if (y + 1 < canvasHeight){
+            pixels[y + 1][x] = new Pixel(x * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x) + ":" + (y + 1) + ",");
+        }
+        if ((y + 1 < canvasHeight) && (x - 1 >= 0)){
+            pixels[y + 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x - 1) + ":" + (y + 1) + ",");
+        }
+        if ((x + 2 < canvasWidth) && (y + 1 < canvasHeight)){
+            pixels[y + 1][x + 2] = new Pixel((x + 2) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x + 2) + ":" + (y + 1) + ",");
+        }
 
+        if ((x + 1 < canvasWidth) && (y + 2 < canvasHeight)){
+            pixels[y + 2][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x + 1) + ":" + (y + 2) + ",");
+        }
+        if (y + 2 < canvasHeight){
+            pixels[y + 2][x] = new Pixel(x * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x) + ":" + (y + 2) + ",");
+        }
+        if ((y + 2 < canvasHeight) && (x - 1 >= 0)){
+            pixels[y + 2][x - 1] = new Pixel((x - 1) * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x - 1) + ":" + (y + 2) + ",");
+        }
+        if ((x + 2 < canvasWidth) && (y + 2 < canvasHeight)){
+            pixels[y + 2][x + 2] = new Pixel((x + 2) * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);
+            currentAction.add((x + 2) + ":" + (y + 2) + ",");
+        }
     }
     
     public void createMouseLabel(){
@@ -708,17 +788,42 @@ public class Canvas {
     public void deleteUndoStack(){
     }
 
-    private void undoAction(){
-        // String poppedAction = undoStack.popUndoStack();
-        // if (poppedAction.substring(0,1).equals("0")){
-            
-        // } else if (poppedAction.substring(0,1).equals("1")){
-            
-        // } else if (poppedAction.substring(0,1).equals("1")){
-        
-        // } else if (poppedAction.substring(0,1).equals("1")){
-        
-        // }
+    public void undoAction(){
+        String poppedAction[] = (undoStack.pop()).split(";");
+        int mode = Integer.parseInt(poppedAction[0]);
+        String rgbValues[] = poppedAction[1].split(":");
+        Color replacedColour = new Color(Integer.parseInt(rgbValues[0]), Integer.parseInt(rgbValues[1]), Integer.parseInt(rgbValues[2]));
+        String indexes[] = poppedAction[2].split(",");
+        switch (mode) {
+            case 0:
+                for (int i = 0; i < indexes.length; i++){
+                    String temp[] = indexes[i].split(":");
+                    int x = Integer.parseInt(temp[0]);
+                    int y = Integer.parseInt(temp[1]);
+                    pixels[y][x] = new Pixel(x * globalPixelSize, y * globalPixelSize, globalPixelSize, Color.WHITE);
+                }
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+            case 6:
+                break;
+            case 7:
+                break;
+            case 8:
+                break;
+            default:
+                break;
+        }
+        canvasPanel.repaint();
+        setCurrentColour(replacedColour);
     }
 
     private void redoAction(){
@@ -743,7 +848,8 @@ public class Canvas {
      */
     private void pushToStack(){
         String action = currentAction.getFirst() + ";";
-        for (int i = 1; i < currentAction.size(); i++){
+        action = action + currentAction.get(1) + ";";
+        for (int i = 2; i < currentAction.size(); i++){
             action = action + currentAction.get(i);
         }
         // System.out.println(temp);
