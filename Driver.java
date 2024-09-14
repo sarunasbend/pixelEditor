@@ -7,6 +7,6 @@ import javax.imageio.ImageIO;
 
 public class Driver {
     public static void main(String[] args) {
-        GUI t = new GUI(1200,800,100,100);
+        GUI t = new GUI(1200,800,80,80);
     }
 }

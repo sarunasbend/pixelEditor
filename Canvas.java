@@ -50,6 +50,7 @@ public class Canvas{
     private int canvasWidth;
     private Pixel[][] pixels;
     private int pixelSize;
+    private int originalPixelSize;
     private Color currentColour = Color.BLACK;
 
     private Color[] permanentColourPalette; //colours that user selected using the RGB slider will be added
@@ -80,16 +81,20 @@ public class Canvas{
     private Stack<String> undoStack; //tracks the last N actions that have altered the canvas
     private ArrayList<String> currentAction; //tracks the current action being performed, adds to top of stack at end of action
 
+    private Stack<int[]> zoomStack; //stores viewport dimensions for zoomout 
+
     public Canvas(int height, int width, int pixelsize){
         canvasHeight = height;
         canvasWidth = width;
         pixelSize = pixelsize;
+        originalPixelSize = pixelsize; 
         viewportEndX = width;
         viewportEndY = height;
         pixels = new Pixel[height][width];
         undoStack = new Stack<>();
         undoStack.setSize(20);
         currentAction = new ArrayList<>();
+        zoomStack = new Stack<int[]>();
         initPixels(); //change pixels to none null
         initPaint(); //paint component
         initCanvas(); //jpanel adjustments
@@ -502,10 +507,8 @@ public class Canvas{
                                 }
                                 break;
                             case 9:
-                                ZoomIn(indexX, indexY);
                                 break;
                             case 10:
-                                ZoomOut(indexX, indexY);
                                 break;
                             default: 
                                 System.out.println("No mode selected");
@@ -872,6 +875,9 @@ public class Canvas{
     }    
     
     public void ZoomIn(int x, int y){
+        int position[] = {viewportStartX, viewportStartY, viewportEndX, viewportEndY, pixelSize};
+        zoomStack.push(position);
+        
         viewportHeight = canvasHeight / zoomFactor;
         viewportWidth = canvasWidth / zoomFactor;
         
@@ -880,7 +886,7 @@ public class Canvas{
 
         viewportEndY = Math.min(canvasHeight,y + (viewportHeight / 2));
         viewportEndX = Math.min(canvasWidth,x + (viewportWidth / 2));
-        
+
         currentZoom *= zoomFactor;
         pixelSize = Math.max((canvasWidth * pixelSize) / (viewportEndX - viewportStartX), (canvasHeight * pixelSize) / (viewportEndY - viewportStartY));
 
@@ -893,36 +899,52 @@ public class Canvas{
                 pixels[i][j].setLocation(newX, newY);
             }
         }
-        System.out.println(pixelSize);
         canvasPanel.repaint();
     }
 
     public void ZoomOut(int centerX, int centerY){
-        if (currentZoom > 1) {
-            viewportHeight = Math.min(canvasHeight, viewportHeight * zoomFactor);
-            viewportWidth = Math.min(canvasWidth, viewportWidth * zoomFactor);
+        // if (currentZoom > 1) {
+        //     viewportHeight = Math.min(canvasHeight, viewportHeight * zoomFactor);
+        //     viewportWidth = Math.min(canvasWidth, viewportWidth * zoomFactor);
 
-            viewportStartY = Math.max(0, centerY - (viewportHeight / 2));
-            viewportStartX = Math.max(0, centerX - (viewportWidth / 2));
+        //     viewportStartY = Math.max(0, centerY - (viewportHeight / 2));
+        //     viewportStartX = Math.max(0, centerX - (viewportWidth / 2));
 
-            viewportEndY = Math.min(canvasHeight, centerY + (viewportHeight / 2));
-            viewportEndX = Math.min(canvasWidth, centerX + (viewportWidth / 2));
+        //     viewportEndY = Math.min(canvasHeight, centerY + (viewportHeight / 2));
+        //     viewportEndX = Math.min(canvasWidth, centerX + (viewportWidth / 2));
 
-            currentZoom /= zoomFactor;
+        //     currentZoom /= zoomFactor;
 
-            pixelSize = Math.max(1, pixelSize / zoomFactor);
+        //     pixelSize = Math.max(1, pixelSize / zoomFactor);
 
-            for (int i = viewportStartY; i < viewportEndY; i++) {
-                for (int j = viewportStartX; j < viewportEndX; j++) {
+        //     for (int i = viewportStartY; i < viewportEndY; i++) {
+        //         for (int j = viewportStartX; j < viewportEndX; j++) {
+        //             pixels[i][j].setGlobalPixelSize(pixelSize);
+
+        //             int newX = (j - viewportStartX) * pixelSize;
+        //             int newY = (i - viewportStartY) * pixelSize;
+        //             pixels[i][j].setLocation(newX, newY);
+        //         }
+        //     }
+        // }
+
+        if (!zoomStack.isEmpty()){
+            int position[] = zoomStack.pop();
+            viewportStartX = position[0];
+            viewportStartY = position[1];
+            viewportEndX = position[2];
+            viewportEndY = position[3];
+            pixelSize = position[4];
+
+            for (int i = viewportStartY; i < viewportEndY; i++){
+                for (int j = viewportStartX; j < viewportEndX; j++){
                     pixels[i][j].setGlobalPixelSize(pixelSize);
-
                     int newX = (j - viewportStartX) * pixelSize;
                     int newY = (i - viewportStartY) * pixelSize;
                     pixels[i][j].setLocation(newX, newY);
                 }
             }
         }
-        System.out.println(pixelSize);
         canvasPanel.repaint();
     }
 }

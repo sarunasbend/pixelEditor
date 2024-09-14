@@ -442,13 +442,15 @@ public class GUI extends JFrame {
             case 8: //trash
                 trashTool.setSelectedTool();
                 break;
-            case 9:
+            case 9: //zoomin
                 zoomInTool.setSelectedTool();
                 break;
-            case 10:
+            case 10: //zoomout
                 zoomOutTool.setSelectedTool();
+                break;
             default:
                 currentCanvasMode = 0;
+                break;
         }
     }
 }
