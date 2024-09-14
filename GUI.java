@@ -80,7 +80,7 @@ public class GUI extends JFrame {
     }
 
     private void addComponents() {
-        blankCanvas = new Canvas(0, 0, pixelSize, canvasWidth, canvasHeight);
+        blankCanvas = new Canvas(canvasHeight, canvasWidth, pixelSize);
         System.out.println(pixelSize);
         JPanel canvas = blankCanvas.getCanvas();
         canvas.setLocation(canvasXPadding, canvasYPadding);
@@ -211,8 +211,8 @@ public class GUI extends JFrame {
             }
         });
 
-        JPanel colourPalette = blankCanvas.getColourPalette();
-        colourPalette.setBounds(0, 250,200,50);
+        // JPanel colourPalette = blankCanvas.getColourPalette();
+        // colourPalette.setBounds(0, 250,200,50);
 
         // JPanel colourPalette = new JPanel();
         // colourPalette.setBackground(Color.GREEN);
@@ -280,7 +280,7 @@ public class GUI extends JFrame {
         right.add(blueSlider);
         right.add(add);
         right.add(remove);
-        right.add(colourPalette);
+        // right.add(colourPalette);
         right.add(mouse);
         right.add(brushSize1);
         right.add(brushSize2);
@@ -386,6 +386,28 @@ public class GUI extends JFrame {
                 blankCanvas.setCurrentCanvasMode(currentCanvasMode);
             }
         });
+
+        zoomInTool.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                previousCanvasMode = currentCanvasMode;
+                zoomInTool.setSelectedTool();
+                currentCanvasMode = 9;
+                highlightTool();
+                blankCanvas.setCurrentCanvasMode(currentCanvasMode);
+            }
+        });
+
+        zoomOutTool.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                previousCanvasMode = currentCanvasMode;
+                zoomOutTool.setSelectedTool();
+                currentCanvasMode = 10;
+                highlightTool();
+                blankCanvas.setCurrentCanvasMode(currentCanvasMode);
+            }            
+        });
     }
 
     /**
@@ -420,6 +442,11 @@ public class GUI extends JFrame {
             case 8: //trash
                 trashTool.setSelectedTool();
                 break;
+            case 9:
+                zoomInTool.setSelectedTool();
+                break;
+            case 10:
+                zoomOutTool.setSelectedTool();
             default:
                 currentCanvasMode = 0;
         }

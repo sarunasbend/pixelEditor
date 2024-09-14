@@ -1,22 +1,15 @@
-import javax.sound.sampled.Line;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import java.awt.AWTException;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Stack;
+import java.awt.Graphics2D;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
-public class Canvas {
+public class Canvas{
     public class Pixel {
         private int originalX; //track position to return to after zooming
         private int originalY;
@@ -39,23 +32,26 @@ public class Canvas {
         public Color getPixelColour(){return this.pixelColour;}
         public Rectangle getRectangle(){return this.rectangle;}
         //setters
-        public void setPixelColour(Color colour){pixelColour = colour;}        
+        public void setPixelColour(Color colour){pixelColour = colour;}
+        public void setGlobalPixelSize(int size){globalPixelSize = size;}
+        
+        public void setLocation(int x, int y){
+            originalX = x; originalY = y;
+            rectangle = new Rectangle(x,y,globalPixelSize, globalPixelSize);
+        }
     }
 
     private JPanel canvasPanel;
     private JLabel mouseLocation;
     private JPanel palettePanel;
     private JPanel volatilePanel;
-    private int xPanel; 
-    private int yPanel; 
-    private int canvasWidth;
-    private int canvasHeight;
-    private int globalPixelSize = 20; 
-    
-    private final RenderingHints renderingHints  = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //anti-aliasing
 
+    private int canvasHeight;
+    private int canvasWidth;
     private Pixel[][] pixels;
-    private Color currentColour = new Color(0, 0, 0);
+    private int pixelSize;
+    private Color currentColour = Color.BLACK;
+
     private Color[] permanentColourPalette; //colours that user selected using the RGB slider will be added
     private int permanentColourIndex = 0;
     private Color[] volatileColourPalette;  //colours that the colour picker selects, temporary colours
@@ -63,122 +59,124 @@ public class Canvas {
     private Color transparentColour = new Color(100,100,100,50);
     private int brushSize = 1; //brush sizes can either by 1, 4, 9 - determines the number of pixels coloured with one click
     private int currentCanvasMode = 0; //this is the tool currently selected, only one can be selected (with the exception of x/y mirror tools being combined)
+    private Rectangle hoverRectangle;
+
+    private int viewportWidth = 0;
+    private int viewportHeight = 0;
+    private int viewportStartX = 0; //range of indexes that will be shown with zoom
+    private int viewportStartY = 0;
+    private int viewportEndX;
+    private int viewportEndY;
+    private int zoomFactor = 2; //each zoom in is a factor of 2
+    private int currentZoom = 1; //tracks current zoom
 
     private int mouseClickX = -1;
     private int mouseClickY = -1;
-
-    private int mouseMoveX = -1;
+    private int mouseMoveX = -1; //track mouse movement for hover rectangle
     private int mouseMoveY = -1;
 
-    // private boolean hasMouseMoved = false;
-    // private boolean hasMousePressed = false;
     private boolean isMouseHeldDown = false;
-    private Rectangle hoverRectangle;
 
     private Stack<String> undoStack; //tracks the last N actions that have altered the canvas
     private ArrayList<String> currentAction; //tracks the current action being performed, adds to top of stack at end of action
 
-    //blank canvas constructor
-    //pixel size is determined before the creation of the program
-    public Canvas(int xP, int yP, int pS, int cW, int cH){
-        xPanel = 0;
-        yPanel = 0;
-        globalPixelSize = pS;
-        canvasWidth = cW;
-        canvasHeight = cH;
-        this.pixels = new Pixel[canvasHeight][canvasWidth]; //height and width is the resolution
-        this.permanentColourPalette = new Color[16]; //palette is able to store 16 colours
-        this.volatileColourPalette = new Color[8]; //last 6 colour picked
-        this.undoStack = new Stack<>();
-        this.undoStack.setSize(20);
-        this.currentAction = new ArrayList<>();
-        initPixels();
-        createPixelCanvas();
-        createMouseLabel();  
-        createVolatilePalette();
+    public Canvas(int height, int width, int pixelsize){
+        canvasHeight = height;
+        canvasWidth = width;
+        pixelSize = pixelsize;
+        viewportEndX = width;
+        viewportEndY = height;
+        pixels = new Pixel[height][width];
+        undoStack = new Stack<>();
+        undoStack.setSize(20);
+        currentAction = new ArrayList<>();
+        initPixels(); //change pixels to none null
+        initPaint(); //paint component
+        initCanvas(); //jpanel adjustments
+        createMouseLabel();
         createPermanentPalette();
+        createVolatilePalette();
+        addMouseListener(); //mouse actions
         canvasPanel.repaint();
     }
 
-    private void createPixelCanvas(){
-        this.canvasPanel = new JPanel(){
-            //main method of the program, allows painting of pixels
+    private void initPixels(){
+        for (int i = 0; i < canvasHeight; i++){
+            for (int j = 0; j < canvasWidth; j++){
+                pixels[i][j] = new Pixel(j * pixelSize, i * pixelSize, pixelSize, Color.WHITE);
+            }
+        }
+    }
+
+    private void initPaint(){
+        this.canvasPanel = new JPanel() {
             @Override
-            protected void paintComponent(Graphics g){
+            public void paintComponent(Graphics g){
                 super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHints(renderingHints); //anti-aliasing
-                g2d.setClip(xPanel, yPanel, canvasWidth * globalPixelSize, canvasHeight * globalPixelSize); //might have to change to specify bounds
-                
+                g.setClip(0, 0, 800, 800);
                 if ((mouseClickX >= 0) && (mouseClickY >= 0)){
-                    for (int i = 0; i < canvasHeight; i++){
-                        for (int j = 0; j < canvasWidth; j++){
-                            if (pixels[i][j] != null){
-                                Rectangle pixel = pixels[i][j].getRectangle();    
-                                g2d.setColor(pixels[i][j].getPixelColour());
-                                g2d.drawRect(pixel.x, pixel.y, pixel.width, pixel.height);
-                                g2d.fillRect(pixel.x, pixel.y, pixel.width, pixel.height); 
-                            }
-                        }
-                    }
-                    if ((mouseMoveY/globalPixelSize < canvasHeight) && (mouseMoveX/globalPixelSize < canvasWidth)){
-                        if (pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize] != null){
-                            Rectangle temp = pixels[mouseMoveY/globalPixelSize][mouseMoveX/globalPixelSize].getRectangle();                            
-                            Rectangle hover;
-                            switch (brushSize){
-                                case 1:
-                                    hover = new Rectangle(temp.x, temp.y, temp.width, temp.height);
-                                    break;
-                                case 2:
-                                    hover = new Rectangle(temp.x, temp.y, temp.width * 2, temp.height * 2);
-                                    break;
-                                case 3:
-                                    hover = new Rectangle(temp.x - globalPixelSize, temp.y - globalPixelSize, temp.width * 3, temp.height * 3);
-                                    break;
-                                case 4:
-                                    hover = new Rectangle(temp.x - globalPixelSize, temp.y - globalPixelSize, temp.width * 4, temp.height * 4);
-                                    break;
-                                default:
-                                    hover = null;
-                                    break;
-                            }
-                            g2d.setColor(Color.RED);
-                            g2d.drawRect(hover.x, hover.y, hover.width, hover.height);
-                            g2d.setColor(transparentColour);
-                            g2d.fillRect(hover.x, hover.y, hover.width, hover.height);
-                            g2d.setColor(currentColour);
+                    for (int i = viewportStartY; i < viewportEndY; i++){
+                        for (int  j = viewportStartX ; j < viewportEndX; j++){
+                            Rectangle pixel = pixels[i][j].getRectangle();    
+                            g.setColor(pixels[i][j].getPixelColour());
+                            g.drawRect(pixel.x, pixel.y, pixelSize, pixelSize);
+                            g.fillRect(pixel.x, pixel.y, pixelSize, pixelSize);
+
                         }
                     }
                 }
-                // // int index = 0;
-                // for (int i = xPanel; i <= (canvasWidth * globalPixelSize); i+=globalPixelSize){
-                //     g2d.setColor(Color.BLACK);
-                //     g2d.drawLine(i, yPanel, i, yPanel + (canvasHeight * globalPixelSize));
-                // }
-                // //horizontal lines
-                // for (int j = yPanel; j <= (canvasHeight * globalPixelSize); j+=globalPixelSize){
-                //     g2d.drawLine(xPanel, j, xPanel + (canvasWidth * globalPixelSize), j);
-                // }
-                // g2d.setColor(currentColour);
+                if ((mouseMoveY/pixelSize + viewportStartY < canvasHeight) && (mouseMoveX/pixelSize + viewportStartX < canvasWidth) && (mouseMoveX > -1) && (mouseMoveY > -1)){
+                    Rectangle temp = pixels[mouseMoveY/pixelSize + viewportStartY][mouseMoveX/pixelSize + + viewportStartX].getRectangle();                        
+                    Rectangle hover;
+                    switch (brushSize){
+                        case 1:
+                            hover = new Rectangle(temp.x, temp.y, temp.width, temp.height);
+                            break;
+                        case 2:
+                            hover = new Rectangle(temp.x, temp.y, temp.width * 2, temp.height * 2);
+                            break;
+                        case 3:
+                            hover = new Rectangle(temp.x - pixelSize, temp.y - pixelSize, temp.width * 3, temp.height * 3);
+                            break;
+                        case 4:
+                            hover = new Rectangle(temp.x - pixelSize, temp.y - pixelSize, temp.width * 4, temp.height * 4);
+                            break;
+                        default:
+                            hover = null;
+                            break;
+                    }
+                    g.setColor(Color.RED);
+                    g.drawRect(hover.x, hover.y, hover.width, hover.height);
+                    g.setColor(transparentColour);
+                    g.fillRect(hover.x, hover.y, hover.width, hover.height);
+                    g.setColor(currentColour);
+                }
             }
         };
-        this.canvasPanel.setSize(this.canvasWidth * this.globalPixelSize, this.canvasHeight * this.globalPixelSize);
-        this.canvasPanel.addMouseListener(new MouseAdapter() {
+    }
+
+    private void initCanvas(){
+        canvasPanel.setSize(canvasWidth * pixelSize, canvasHeight * pixelSize);
+    }
+
+    private void addMouseListener(){
+        canvasPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent event){
                 isMouseHeldDown = true;
                 currentAction.add(Integer.toString(currentCanvasMode));
                 currentAction.add(Integer.toString(currentColour.getRed()) + ":" + Integer.toString(currentColour.getGreen()) + ":" + Integer.toString(currentColour.getBlue()));
-                mouseClickX = mouseMoveX = ((event.getX() / globalPixelSize) * globalPixelSize);
-                mouseClickY = mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
-                int indexX = mouseClickX / globalPixelSize;
-                int indexY = mouseClickY / globalPixelSize;
+                mouseClickX = mouseMoveX = event.getX(); //mouseClick is only necessary for finding out the index of pixel
+                mouseClickY = mouseMoveY = event.getY(); //mouseMove is needed for the hover rectangle
+                int indexX = (mouseClickX / pixelSize) + viewportStartX; //finds index of placed pixel, pixel size will change with the zoom of the canvas
+                int indexY = (mouseClickY / pixelSize) + viewportStartY; //viewPort is for when it is zoomed in
 
-                if ((indexX < canvasWidth) && (indexY < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
-                    int midpoint;                
+                if ((indexX < canvasWidth) && (indexY < canvasHeight) && (mouseClickX > - 1) && (mouseClickY > -1)){
+                    // pixels[indexY][indexX].setPixelColour(currentColour);
+                    int midpoint;
                     switch (currentCanvasMode){
                         case 0:
-                            pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                            pixels[indexY][indexX].setPixelColour(currentColour);
                             if (!currentAction.get(currentAction.size() - 1).equals(indexX + ":" + indexY + ",")){
                                 currentAction.add(indexX + ":" + indexY + ",");
                             }
@@ -223,7 +221,7 @@ public class Canvas {
                         case 5: //undo
                             break;
                         case 6: //xmirror
-                            pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                            pixels[indexY][indexX].setPixelColour(currentColour);
                             if (brushSize == 2){
                                 brushTwo(indexY, indexX, currentColour);
                             } else if (brushSize == 3){
@@ -234,8 +232,8 @@ public class Canvas {
                             midpoint = canvasHeight / 2;
                             if (canvasHeight % 2 == 0){
                                 if (indexY < midpoint){
-                                    mouseClickY = (canvasHeight * globalPixelSize) - mouseClickY - globalPixelSize;
-                                    pixels[canvasHeight - 1 - indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    mouseClickY = (canvasHeight * pixelSize) - mouseClickY - pixelSize;
+                                    pixels[canvasHeight - 1 - indexY][indexX].setPixelColour(currentColour);
                                     if (brushSize == 2){
                                         brushTwo(canvasHeight - 1 - indexY, indexX, currentColour);
                                     } else if (brushSize == 3){
@@ -246,8 +244,8 @@ public class Canvas {
                                 }
                             } else {
                                 if (indexY < midpoint){
-                                    mouseClickY = (canvasHeight * globalPixelSize) - mouseClickY - globalPixelSize;
-                                    pixels[canvasHeight - 1 - indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    mouseClickY = (canvasHeight * pixelSize) - mouseClickY - pixelSize;
+                                    pixels[canvasHeight - 1 - indexY][indexX].setPixelColour(currentColour);
                                     if (brushSize == 2){
                                         brushTwo(canvasHeight - 1 - indexY, indexX, currentColour);
                                     } else if (brushSize == 3){
@@ -256,8 +254,8 @@ public class Canvas {
                                         brushFour(canvasHeight - 1 - indexY, indexX, currentColour);
                                     }
                                 } else if (indexY > midpoint){
-                                    mouseClickY = (canvasHeight - 1 - indexY) * globalPixelSize;
-                                    pixels[midpoint - (indexY - midpoint)][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    mouseClickY = (canvasHeight - 1 - indexY) * pixelSize;
+                                    pixels[midpoint - (indexY - midpoint)][indexX].setPixelColour(currentColour);
                                     if (brushSize == 2){
                                         brushTwo(midpoint - (indexY - midpoint), indexX, currentColour);
                                     } else if (brushSize == 3){
@@ -270,7 +268,7 @@ public class Canvas {
                             canvasPanel.repaint();
                             break;
                         case 7: //ymirror
-                            pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                            pixels[indexY][indexX].setPixelColour(currentColour);
                             if (brushSize == 2){
                                 brushTwo(indexY, indexX, currentColour);
                             } else if (brushSize == 3){
@@ -282,8 +280,8 @@ public class Canvas {
                             if (canvasWidth % 2 == 0) {
                                 //even width canvas
                                 if (indexX < midpoint) {
-                                    mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
-                                    pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    mouseClickX = (canvasWidth * pixelSize) - mouseClickX - pixelSize;
+                                    pixels[indexY][canvasWidth - 1 - indexX].setPixelColour(currentColour);
                                     if (brushSize == 2){
                                         brushTwo(indexY, canvasWidth - 1 - indexX, currentColour);
                                     } else if (brushSize == 3){
@@ -295,8 +293,8 @@ public class Canvas {
                             } else {
                                 //odd width canvas
                                 if (indexX < midpoint) {
-                                    mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
-                                    pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    mouseClickX = (canvasWidth * pixelSize) - mouseClickX - pixelSize;
+                                    pixels[indexY][canvasWidth - 1 - indexX].setPixelColour(currentColour);
                                     if (brushSize == 2){
                                         brushTwo(indexY, canvasWidth - 1 - indexX, currentColour);
                                     } else if (brushSize == 3){
@@ -305,8 +303,8 @@ public class Canvas {
                                         brushFour(indexY, canvasWidth - 1 - indexX, currentColour);
                                     }
                                 } else if (indexX > midpoint) {
-                                    mouseClickX = (canvasWidth - 1 - indexX) * globalPixelSize;
-                                    pixels[indexY][midpoint - (indexX - midpoint)] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                    mouseClickX = (canvasWidth - 1 - indexX) * pixelSize;
+                                    pixels[indexY][midpoint - (indexX - midpoint)].setPixelColour(currentColour);
                                     if (brushSize == 2){
                                         brushTwo(indexY, midpoint - (indexX - midpoint), currentColour);
                                     } else if (brushSize == 3){
@@ -325,6 +323,12 @@ public class Canvas {
                                 }
                             }
                             break;
+                        case 9:
+                            ZoomIn(indexX, indexY);
+                            break;
+                        case 10:
+                            ZoomOut(indexX, indexY);
+                            break;
                         default:
                             System.out.println("No mode selected");
                     }
@@ -338,25 +342,24 @@ public class Canvas {
             }
         });
 
-        this.canvasPanel.addMouseMotionListener(new MouseAdapter() {
+        canvasPanel.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent event){
                 if (isMouseHeldDown){
-                    mouseClickX  = mouseMoveX = ((event.getX() / globalPixelSize) * globalPixelSize);
-                    mouseClickY = mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
-                    setMouseLocationText(mouseMoveX / globalPixelSize, mouseMoveY / globalPixelSize);
-                    hoverRectangle = new Rectangle(mouseMoveX, mouseMoveY, globalPixelSize, globalPixelSize);
-                    int indexX = mouseClickX / globalPixelSize;
-                    int indexY = mouseClickY / globalPixelSize;
-                    
-                    if ((indexX < canvasWidth) && (indexY < canvasHeight) && (mouseClickX > -1) && (mouseClickY > -1)){
+                    mouseClickX = mouseMoveX = event.getX();
+                    mouseClickY = mouseMoveY = event.getY();
+                    int indexX = (mouseClickX / pixelSize) + viewportStartX; //finds index of placed pixel, pixel size will change with the zoom of the canvas
+                    int indexY = (mouseClickY / pixelSize) + viewportStartY; //viewPort is for when it is zoomed in
+
+                    if ((indexX < canvasWidth) && (indexY < canvasHeight) && (mouseClickX > - 1) && (mouseClickY > -1)){
+                        // pixels[indexY][indexX].setPixelColour(currentColour);
                         int midpoint;
                         switch (currentCanvasMode){
                             case 0: //pen
                                 if (!currentAction.get(currentAction.size() - 1).equals(indexX + ":" + indexY + ",")){ //prevents multiple additions of same action
                                     currentAction.add(indexX + ":" + indexY + ",");
                                 }
-                                pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                pixels[indexY][indexX].setPixelColour(currentColour);
                                 if (brushSize == 2){
                                     brushTwo(indexY, indexX, currentColour);
                                 } else if (brushSize == 3){
@@ -390,7 +393,7 @@ public class Canvas {
                             case 5: //undo
                                 break;
                             case 6: //xmirror
-                                pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                pixels[indexY][indexX].setPixelColour(currentColour);
                                 if (!currentAction.get(currentAction.size() - 1).equals(indexX + ":" + indexY + ",")){ //prevents multiple additions of same action
                                     currentAction.add(indexX + ":" + indexY + ",");
                                 }
@@ -404,8 +407,8 @@ public class Canvas {
                                 midpoint = canvasHeight / 2;
                                 if (canvasHeight % 2 == 0){
                                     if (indexY < midpoint){
-                                        mouseClickY = (canvasHeight * globalPixelSize) - mouseClickY - globalPixelSize;
-                                        pixels[canvasHeight - 1 - indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                        mouseClickY = (canvasHeight * pixelSize) - mouseClickY - pixelSize;
+                                        pixels[canvasHeight - 1 - indexY][indexX].setPixelColour(currentColour);
                                         if (brushSize == 2){
                                             brushTwo(canvasHeight - 1 - indexY, indexX, currentColour);
                                         } else if (brushSize == 3){
@@ -416,8 +419,8 @@ public class Canvas {
                                     }
                                 } else {
                                     if (indexY < midpoint){
-                                        mouseClickY = (canvasHeight * globalPixelSize) - mouseClickY - globalPixelSize;
-                                        pixels[canvasHeight - 1 - indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                        mouseClickY = (canvasHeight * pixelSize) - mouseClickY - pixelSize;
+                                        pixels[canvasHeight - 1 - indexY][indexX].setPixelColour(currentColour);
                                         if (brushSize == 2){
                                             brushTwo(canvasHeight - 1 - indexY, indexX, currentColour);
                                         } else if (brushSize == 3){
@@ -426,8 +429,8 @@ public class Canvas {
                                             brushFour(canvasHeight - 1 - indexY, indexX, currentColour);
                                         }
                                     } else if (indexY > midpoint){
-                                        mouseClickY = (canvasHeight - 1 - indexY) * globalPixelSize;
-                                        pixels[midpoint - (indexY - midpoint)][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                        mouseClickY = (canvasHeight - 1 - indexY) * pixelSize;
+                                        pixels[midpoint - (indexY - midpoint)][indexX].setPixelColour(currentColour);
                                         if (brushSize == 2){
                                             brushTwo(midpoint - (indexY - midpoint), indexX, currentColour);
                                         } else if (brushSize == 3){
@@ -440,7 +443,7 @@ public class Canvas {
                                 canvasPanel.repaint();
                                 break;
                             case 7: //xmirror   
-                                pixels[indexY][indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                pixels[indexY][indexX].setPixelColour(currentColour);
                                 if (!currentAction.get(currentAction.size() - 1).equals(indexX + ":" + indexY + ",")){ //prevents multiple additions of same action
                                     currentAction.add(indexX + ":" + indexY + ",");
                                 }
@@ -455,8 +458,8 @@ public class Canvas {
                                 if (canvasWidth % 2 == 0) {
                                     //even width canvas
                                     if (indexX < midpoint) {
-                                        mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
-                                        pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                        mouseClickX = (canvasWidth * pixelSize) - mouseClickX - pixelSize;
+                                        pixels[indexY][canvasWidth - 1 - indexX].setPixelColour(currentColour);
                                         if (brushSize == 2){
                                             brushTwo(indexY, canvasWidth - 1 - indexX, currentColour);
                                         } else if (brushSize == 3){
@@ -468,8 +471,8 @@ public class Canvas {
                                 } else {
                                     //odd width canvas
                                     if (indexX < midpoint) {
-                                        mouseClickX = (canvasWidth * globalPixelSize) - mouseClickX - globalPixelSize;
-                                        pixels[indexY][canvasWidth - 1 - indexX] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                        mouseClickX = (canvasWidth * pixelSize) - mouseClickX - pixelSize;
+                                        pixels[indexY][canvasWidth - 1 - indexX].setPixelColour(currentColour);
                                         if (brushSize == 2){
                                             brushTwo(indexY, canvasWidth - 1 - indexX, currentColour);
                                         } else if (brushSize == 3){
@@ -478,8 +481,8 @@ public class Canvas {
                                             brushFour(indexY, canvasWidth - 1 - indexX, currentColour);
                                         }
                                     } else if (indexX > midpoint) {
-                                        mouseClickX = (canvasWidth - 1 - indexX) * globalPixelSize;
-                                        pixels[indexY][midpoint - (indexX - midpoint)] = new Pixel(mouseClickX, mouseClickY, globalPixelSize, currentColour);
+                                        mouseClickX = (canvasWidth - 1 - indexX) * pixelSize;
+                                        pixels[indexY][midpoint - (indexX - midpoint)].setPixelColour(currentColour);
                                         if (brushSize == 2){
                                             brushTwo(indexY, midpoint - (indexX - midpoint), currentColour);
                                         } else if (brushSize == 3){
@@ -498,19 +501,25 @@ public class Canvas {
                                     }
                                 }
                                 break;
+                            case 9:
+                                ZoomIn(indexX, indexY);
+                                break;
+                            case 10:
+                                ZoomOut(indexX, indexY);
+                                break;
                             default: 
                                 System.out.println("No mode selected");
                         }
                     }
+                    canvasPanel.repaint();
                 }
             }
-            //tracks the position of the mouse whenever it is moved by the user
+            
             @Override
             public void mouseMoved(MouseEvent event){
-                mouseMoveX = ((event.getX() / globalPixelSize) * globalPixelSize);
-                mouseMoveY = ((event.getY() / globalPixelSize) * globalPixelSize);
-                setMouseLocationText(mouseMoveX / globalPixelSize, mouseMoveY / globalPixelSize);
-                hoverRectangle = new Rectangle(mouseMoveX, mouseMoveY, globalPixelSize, globalPixelSize); //creates a rectangle on mouse location 
+                mouseMoveX = ((event.getX() / pixelSize) * pixelSize);
+                mouseMoveY = ((event.getY() / pixelSize) * pixelSize);
+                setMouseLocationText(mouseMoveX / pixelSize, mouseMoveY / pixelSize);
                 canvasPanel.repaint(); //so that it is consistently updated
             }
         });
@@ -518,122 +527,122 @@ public class Canvas {
 
     private void brushTwo(int y, int x, Color paintColour){
         if (x + 1 < canvasWidth){
-            pixels[y][x + 1] = new Pixel((x + 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y][x + 1].setPixelColour(paintColour);
             currentAction.add((x + 1) + ":" + y + ",");
         }
         if (y + 1 < canvasHeight){
-            pixels[y + 1][x] = new Pixel(x * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y + 1][x].setPixelColour(paintColour);
             currentAction.add(x + ":" + (y + 1) + ",");
         }
         if ((x + 1 < canvasWidth) && (y + 1 < canvasHeight)){
-            pixels[y + 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y + 1][x + 1].setPixelColour(paintColour);
             currentAction.add((x + 1) + ":" + (y + 1) + ",");
         }
     }
 
     private void brushThree(int y, int x, Color paintColour){
         if ((y - 1 >= 0) && (x - 1 >= 0)){
-            pixels[y - 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y - 1][x - 1].setPixelColour(paintColour);
             currentAction.add((x - 1) + ":" + (y - 1) + ",");
         }
         if (y - 1 >= 0){
-            pixels[y - 1][x] = new Pixel(x * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y - 1][x].setPixelColour(paintColour);
             currentAction.add((x) + ":" + (y - 1) + ",");
 
         }
         if ((y - 1 >= 0) && (x + 1 < canvasWidth)){
-            pixels[y - 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y - 1][x + 1].setPixelColour(paintColour);
             currentAction.add((x + 1) + ":" + (y - 1) + ",");
         }
         if (x - 1 >= 0){
-            pixels[y][x - 1] = new Pixel((x - 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y][x - 1].setPixelColour(paintColour);
             currentAction.add((x - 1) + ":" + (y) + ",");
         }
         if (x + 1 < canvasWidth){
-            pixels[y][x + 1] = new Pixel((x + 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y][x + 1].setPixelColour(paintColour);
             currentAction.add((x + 1) + ":" + (y) + ",");
         }
         if ((y + 1 < canvasHeight) && (x - 1 >= 0)){
-            pixels[y + 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y + 1][x - 1].setPixelColour(paintColour);
             currentAction.add((x - 1) + ":" + (y + 1) + ",");
         }
         if (y + 1 < canvasHeight){
-            pixels[y + 1][x] = new Pixel(x * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y + 1][x].setPixelColour(paintColour);
             currentAction.add((x) + ":" + (y + 1) + ",");
         }
         if ((x + 1 < canvasWidth) && (y + 1 < canvasHeight)){
-            pixels[y + 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y + 1][x + 1].setPixelColour(paintColour);
             currentAction.add((x + 1) + ":" + (y + 1) + ",");
         }
     }
 
     private void brushFour(int y, int x, Color paintColour){
         if ((y - 1 >= 0) && (x - 1 >= 0)){
-            pixels[y - 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y - 1][x - 1].setPixelColour(paintColour);
             currentAction.add((x - 1) + ":" + (y - 1) + ",");
         }
         if (y - 1 >= 0){
-            pixels[y - 1][x] = new Pixel(x * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y - 1][x].setPixelColour(paintColour);
             currentAction.add((x) + ":" + (y - 1) + ",");
         }
         if ((y - 1 >= 0) && (x + 1 < canvasWidth)){
-            pixels[y - 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y - 1][x + 1].setPixelColour(paintColour);
             currentAction.add((x + 1) + ":" + (y - 1) + ",");
         }
         if ((y - 1 >= 0) && (x + 2 < canvasWidth)){
-            pixels[y - 1][x + 2] = new Pixel((x + 2) * globalPixelSize, (y - 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y - 1][x + 2].setPixelColour(paintColour);
             currentAction.add((x + 2) + ":" + (y - 1) + ",");
         }
 
         if (x - 1 >= 0){
-            pixels[y][x - 1] = new Pixel((x - 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y][x - 1].setPixelColour(paintColour);
             currentAction.add((x - 1) + ":" + (y) + ",");
         }
         if (x + 1 < canvasWidth){
-            pixels[y][x + 1] = new Pixel((x + 1) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y][x + 1].setPixelColour(paintColour);
             currentAction.add((x + 1) + ":" + (y) + ",");
         }
         if (x + 2 < canvasWidth){
-            pixels[y][x + 2] = new Pixel((x + 2) * globalPixelSize, y * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y][x + 2].setPixelColour(paintColour);
             currentAction.add((x + 2) + ":" + (y) + ",");
         }
 
         if ((x + 1 < canvasWidth) && (y + 1 < canvasHeight)){
-            pixels[y + 1][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y + 1][x + 1].setPixelColour(paintColour);
             currentAction.add((x + 1) + ":" + (y + 1) + ",");
 
         }
         if (y + 1 < canvasHeight){
-            pixels[y + 1][x] = new Pixel(x * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y + 1][x].setPixelColour(paintColour);
             currentAction.add((x) + ":" + (y + 1) + ",");
         }
         if ((y + 1 < canvasHeight) && (x - 1 >= 0)){
-            pixels[y + 1][x - 1] = new Pixel((x - 1) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y + 1][x - 1].setPixelColour(paintColour);
             currentAction.add((x - 1) + ":" + (y + 1) + ",");
         }
         if ((x + 2 < canvasWidth) && (y + 1 < canvasHeight)){
-            pixels[y + 1][x + 2] = new Pixel((x + 2) * globalPixelSize, (y + 1) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y + 1][x + 2].setPixelColour(paintColour);
             currentAction.add((x + 2) + ":" + (y + 1) + ",");
         }
 
         if ((x + 1 < canvasWidth) && (y + 2 < canvasHeight)){
-            pixels[y + 2][x + 1] = new Pixel((x + 1) * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y + 2][x + 1].setPixelColour(paintColour);
             currentAction.add((x + 1) + ":" + (y + 2) + ",");
         }
         if (y + 2 < canvasHeight){
-            pixels[y + 2][x] = new Pixel(x * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y + 2][x].setPixelColour(paintColour);
             currentAction.add((x) + ":" + (y + 2) + ",");
         }
         if ((y + 2 < canvasHeight) && (x - 1 >= 0)){
-            pixels[y + 2][x - 1] = new Pixel((x - 1) * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y + 2][x - 1].setPixelColour(paintColour);
             currentAction.add((x - 1) + ":" + (y + 2) + ",");
         }
         if ((x + 2 < canvasWidth) && (y + 2 < canvasHeight)){
-            pixels[y + 2][x + 2] = new Pixel((x + 2) * globalPixelSize, (y + 2) * globalPixelSize, globalPixelSize, paintColour);
+            pixels[y + 2][x + 2].setPixelColour(paintColour);
             currentAction.add((x + 2) + ":" + (y + 2) + ",");
         }
     }
-    
+
     public void createMouseLabel(){
         this.mouseLocation = new JLabel("[ 0 : 0 ]");
         this.mouseLocation.setSize(100,50);
@@ -685,14 +694,6 @@ public class Canvas {
             depthFirstSearch(indexY - 1, indexX, replacedColour);
             depthFirstSearch(indexY, indexX + 1, replacedColour);
             depthFirstSearch(indexY, indexX - 1, replacedColour);
-        }
-    }
-
-    private void initPixels(){
-        for (int i = 0; i < this.canvasHeight; i++){
-            for (int j = 0; j < this.canvasWidth; j++){
-                pixels[i][j] = new Pixel(j * globalPixelSize, i * globalPixelSize, globalPixelSize, Color.WHITE);
-            }
         }
     }
 
@@ -800,7 +801,7 @@ public class Canvas {
                     String temp[] = indexes[i].split(":");
                     int x = Integer.parseInt(temp[0]);
                     int y = Integer.parseInt(temp[1]);
-                    pixels[y][x] = new Pixel(x * globalPixelSize, y * globalPixelSize, globalPixelSize, Color.WHITE);
+                    pixels[y][x] = new Pixel(x * pixelSize, y * pixelSize, pixelSize, Color.WHITE);
                 }
                 break;
             case 1:
@@ -854,12 +855,12 @@ public class Canvas {
         }
         // System.out.println(temp);
         undoStack.push(action);
-        printStack();
+        // printStack();
         currentAction.clear();
     }
 
     public void setGlobalPixel(int size){
-        this.globalPixelSize = size;
+        this.pixelSize = size;
     }
 
     //TEMPORARY METHOD TO CHECK FUNCTIONALITY
@@ -868,5 +869,60 @@ public class Canvas {
             System.out.println(x);
         }
         System.out.println();
+    }    
+    
+    public void ZoomIn(int x, int y){
+        viewportHeight = canvasHeight / zoomFactor;
+        viewportWidth = canvasWidth / zoomFactor;
+        
+        viewportStartY = Math.max(0,y - (viewportHeight / 2));
+        viewportStartX = Math.max(0,x - (viewportWidth / 2));
+
+        viewportEndY = Math.min(canvasHeight,y + (viewportHeight / 2));
+        viewportEndX = Math.min(canvasWidth,x + (viewportWidth / 2));
+        
+        currentZoom *= zoomFactor;
+        pixelSize = Math.max((canvasWidth * pixelSize) / (viewportEndX - viewportStartX), (canvasHeight * pixelSize) / (viewportEndY - viewportStartY));
+
+        for (int i = viewportStartY; i < viewportEndY; i++){
+            for (int j = viewportStartX; j < viewportEndX; j++){
+                pixels[i][j].setGlobalPixelSize(pixelSize);
+
+                int newX = (j - viewportStartX) * pixelSize;
+                int newY = (i - viewportStartY) * pixelSize;
+                pixels[i][j].setLocation(newX, newY);
+            }
+        }
+        System.out.println(pixelSize);
+        canvasPanel.repaint();
+    }
+
+    public void ZoomOut(int centerX, int centerY){
+        if (currentZoom > 1) {
+            viewportHeight = Math.min(canvasHeight, viewportHeight * zoomFactor);
+            viewportWidth = Math.min(canvasWidth, viewportWidth * zoomFactor);
+
+            viewportStartY = Math.max(0, centerY - (viewportHeight / 2));
+            viewportStartX = Math.max(0, centerX - (viewportWidth / 2));
+
+            viewportEndY = Math.min(canvasHeight, centerY + (viewportHeight / 2));
+            viewportEndX = Math.min(canvasWidth, centerX + (viewportWidth / 2));
+
+            currentZoom /= zoomFactor;
+
+            pixelSize = Math.max(1, pixelSize / zoomFactor);
+
+            for (int i = viewportStartY; i < viewportEndY; i++) {
+                for (int j = viewportStartX; j < viewportEndX; j++) {
+                    pixels[i][j].setGlobalPixelSize(pixelSize);
+
+                    int newX = (j - viewportStartX) * pixelSize;
+                    int newY = (i - viewportStartY) * pixelSize;
+                    pixels[i][j].setLocation(newX, newY);
+                }
+            }
+        }
+        System.out.println(pixelSize);
+        canvasPanel.repaint();
     }
 }
