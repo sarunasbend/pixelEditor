@@ -47,7 +47,6 @@ public class RGBPanel {
 
     private void createPane(){
         pane = new JLayeredPane();
-        //input hexcodes
     }
 
     private void addToPanel(){

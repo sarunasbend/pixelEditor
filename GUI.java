@@ -5,6 +5,8 @@ import components.ColourPickerToolLabel;
 import components.EditorTitle;
 import components.EraserToolLabel;
 import components.PenToolLabel;
+import components.RGBButtonPane;
+import components.RGBButtonPane;
 import components.RGBPanel;
 import components.RedoToolLabel;
 import components.TrashToolLabel;
@@ -231,82 +233,18 @@ public class GUI extends JFrame {
         JPanel miniMap = new JPanel();
         miniMap.setBackground(Color.RED);
         miniMap.setBounds(0,0,200,200);
-        
-        // JLabel label = new JLabel("Colour Palette");
-        // label.setBounds(0,200,200,50);
-        // label.setForeground(Color.WHITE);
-        
-        // JPanel colourPalette = new JPanel();
-        // colourPalette.setBounds(0,250,200,100);
-        // colourPalette.setBackground(Color.WHITE);
-
-        // JSlider redSlider = new JSlider(JSlider.VERTICAL, 0,255,128);
-        // redSlider.setBounds(0,350,50,100);
-
-        // JLabel red = new JLabel("255");
-        // red.setBounds(150,350,50,50);
-
-        // JSlider greenSlider = new JSlider(JSlider.VERTICAL, 0,255,128);
-        // greenSlider.setBounds(50,350,50,100);
-
-        // JSlider blueSlider = new JSlider(JSlider.VERTICAL,0,255,128);
-        // blueSlider.setBounds(100,350, 50,100);
-
-        // JButton add = new JButton("ADD");
-        // add.setBounds(0,150,100,100);
-        // add.addMouseListener(new MouseAdapter() {
-        //     @Override
-        //     public void mouseClicked(MouseEvent e){
-        //         blankCanvas.addToPermanentPalette(new Color(redSlider.getValue(), greenSlider.getValue(), blueSlider.getValue()));
-        //     }
-        // });
-
-        // JButton remove = new JButton("REM");
-        // remove.setBounds(100,150,100,100);
-        // remove.addMouseListener(new MouseAdapter() {
-        //     @Override
-        //     public void mouseClicked(MouseEvent e){
-        //         blankCanvas.removeFromPermanentPalette();
-        //     }
-        // });
-
-        // JPanel colourPalette = blankCanvas.getColourPalette();
-        // colourPalette.setBounds(0, 250,200,50);
-
-        // JPanel colourPalette = new JPanel();
-        // colourPalette.setBackground(Color.GREEN);
-        // colourPalette.setBounds(0,200,200,100);
-        // colourPalette.addMouseListener(new MouseAdapter() {
-        //     @Override
-        //     public void mouseClicked(MouseEvent event){
-        //         int red = redSlider.getValue();
-        //         int green = greenSlider.getValue();
-        //         int blue = blueSlider.getValue();
-        //         blankCanvas.setCurrentColour(new Color(red, green, blue));
-        //         System.out.println(red + " , " + green + " , " + blue);
-        //     }            
-        // });
-
-        // JPanel palette = blankCanvas.getVolatilePanel();
-        // palette.setBounds(0,150,200,100);
-        
+                
         RGBPanel rgbPanel = new RGBPanel(200, 350, "components/resources/RGBPanel.png");
         JLayeredPane pane = rgbPanel.getPane();
-        pane.setBounds(0,200,200,350);
+        pane.setBounds(0,200,200,300);
 
-        // right.add(palette);
+        RGBButtonPane rgbButtonPanel = new RGBButtonPane(200, 75, "components/resources/ButtonPanel.png");
+        JLayeredPane pane2 = rgbButtonPanel.getPane();
+        pane2.setBounds(0,500,200,75);
         right.add(miniMap);
-        // right.add(colourPalette);
         right.add(pane);
-        // right.add(redSlider);
-        // // right.add(red);
-        // right.add(greenSlider);
-        // right.add(blueSlider);
-        // right.add(add);
-        // right.add(remove);
-        // right.add(colourPalette);
+        right.add(pane2);
         right.add(mouse);
-        // right.add(label);
     }
 
     private void addActionListeners(){
