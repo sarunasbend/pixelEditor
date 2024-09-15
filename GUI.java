@@ -5,6 +5,7 @@ import components.ColourPickerToolLabel;
 import components.EditorTitle;
 import components.EraserToolLabel;
 import components.PenToolLabel;
+import components.RGBPanel;
 import components.RedoToolLabel;
 import components.TrashToolLabel;
 import components.UndoToolLabel;
@@ -119,37 +120,80 @@ public class GUI extends JFrame {
         editorTitle.setBounds(0,0,200,100);
         
         penTool = new PenToolLabel(100, 50, "components\\resources\\PenTool.png", "components\\resources\\PenToolHighlight.png");
-        penTool.setBounds(0,100,100,50);
+        penTool.setBounds(0,200,100,50);
 
         eraserTool = new EraserToolLabel(100, 50, "components\\resources\\EraserTool.png", "components\\resources\\EraserToolHighlight.png");
-        eraserTool.setBounds(100,100,100,50);
+        eraserTool.setBounds(100,200,100,50);
 
         colourPickerTool = new ColourPickerToolLabel(100, 50, "components\\resources\\ColourPickerTool.png", "components\\resources\\ColourPickerToolHighlight.png");
-        colourPickerTool.setBounds(0,150,100,50);
+        colourPickerTool.setBounds(0,250,100,50);
 
         bucketFillTool = new BucketFillToolLabel(100, 50, "components\\resources\\BucketFillTool.png", "components\\resources\\BucketFillToolHighlight.png");
-        bucketFillTool.setBounds(100,150,100,50);
+        bucketFillTool.setBounds(100,250,100,50);
 
         redoTool = new RedoToolLabel(100, 50, "components\\resources\\RedoTool.png" ,"components\\resources\\RedoToolHighlight.png");
-        redoTool.setBounds(0,200,100,50);
+        redoTool.setBounds(0,300,100,50);
 
         undoTool = new UndoToolLabel(100, 50, "components\\resources\\UndoTool.png", "components\\resources\\UndoToolHighlight.png");
-        undoTool.setBounds(100,200,100,50);
+        undoTool.setBounds(100,300,100,50);
 
         xMirrorTool = new XMirrorToolLabel(100, 50, "components\\resources\\XMirrorTool.png", "components\\resources\\XMirrorToolHighlight.png");
-        xMirrorTool.setBounds(0,250,100,50);
+        xMirrorTool.setBounds(0,350,100,50);
 
         yMirrorTool = new YMirrorToolLabel(100, 50, "components\\resources\\YMirrorTool.png", "components\\resources\\YMirrorToolHighlight.png");
-        yMirrorTool.setBounds(100,250,100,50);
+        yMirrorTool.setBounds(100,350,100,50);
 
         trashTool = new TrashToolLabel(100, 50, "components\\resources\\TrashTool.png", "components\\resources\\TrashToolHighlight.png");
-        trashTool.setBounds(0,300,100,50);
+        trashTool.setBounds(0,400,100,50);
         
         zoomInTool = new ZoomInToolLabel(100, 50, "components\\resources\\ZoomInTool.png" , "components\\resources\\ZoomInToolHighlight.png");
-        zoomInTool.setBounds(0,350,100,50);
+        zoomInTool.setBounds(0,450,100,50);
 
         zoomOutTool = new ZoomOutToolLabel(100, 50, "components\\resources\\ZoomOutTool.png" , "components\\resources\\ZoomOutToolHighlight.png");
-        zoomOutTool.setBounds(100,350,100,50);
+        zoomOutTool.setBounds(100,450,100,50);
+
+        JPanel brushSize1 = new JPanel();
+        brushSize1.setBackground(new Color(250, 0 , 0));
+        brushSize1.setBounds(0,150,50,50);
+        brushSize1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                System.out.println("1");
+                blankCanvas.setBrushSize(1);
+            }            
+        });
+
+        JPanel brushSize2 = new JPanel();
+        brushSize2.setBackground(new Color(200, 0 , 0));
+        brushSize2.setBounds(50,150,50,50);
+        brushSize2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                System.out.println("2");
+                blankCanvas.setBrushSize(2);
+            }
+        });
+
+        JPanel brushSize3 = new JPanel();
+        brushSize3.setBackground(new Color(150, 0 , 0));
+        brushSize3.setBounds(100,150,50,50);
+        brushSize3.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                System.out.println("3");
+                blankCanvas.setBrushSize(3);
+            }            
+        });
+
+        JPanel brushSize4 = new JPanel();
+        brushSize4.setBackground(new Color(100, 0 , 0));
+        brushSize4.setBounds(150,150,50,50);
+        brushSize4.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                blankCanvas.setBrushSize(4);
+            }            
+        });
 
         //adds all elements to Panel
         left.add(editorTitle);
@@ -164,6 +208,10 @@ public class GUI extends JFrame {
         left.add(trashTool);
         left.add(zoomInTool);
         left.add(zoomOutTool);
+        left.add(brushSize1);
+        left.add(brushSize2);
+        left.add(brushSize3);
+        left.add(brushSize4);
     }
 
     //TEMPORARY MOUSELISTENERS IN THIS CLASS
@@ -180,36 +228,47 @@ public class GUI extends JFrame {
             e.printStackTrace();
         }
         
-        // JPanel miniMap = new JPanel();
-        // miniMap.setBackground(Color.RED);
-        // miniMap.setBounds(0,0,200,200);
+        JPanel miniMap = new JPanel();
+        miniMap.setBackground(Color.RED);
+        miniMap.setBounds(0,0,200,200);
         
-        JSlider redSlider = new JSlider(0,255,128);
-        redSlider.setBounds(0,0,200,50);
+        // JLabel label = new JLabel("Colour Palette");
+        // label.setBounds(0,200,200,50);
+        // label.setForeground(Color.WHITE);
+        
+        // JPanel colourPalette = new JPanel();
+        // colourPalette.setBounds(0,250,200,100);
+        // colourPalette.setBackground(Color.WHITE);
 
-        JSlider greenSlider = new JSlider(0,255,128);
-        greenSlider.setBounds(0,50,200,50);
+        // JSlider redSlider = new JSlider(JSlider.VERTICAL, 0,255,128);
+        // redSlider.setBounds(0,350,50,100);
 
-        JSlider blueSlider = new JSlider(0,255,128);
-        blueSlider.setBounds(0,100,200,50);
+        // JLabel red = new JLabel("255");
+        // red.setBounds(150,350,50,50);
 
-        JButton add = new JButton("ADD");
-        add.setBounds(0,150,100,100);
-        add.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e){
-                blankCanvas.addToPermanentPalette(new Color(redSlider.getValue(), greenSlider.getValue(), blueSlider.getValue()));
-            }
-        });
+        // JSlider greenSlider = new JSlider(JSlider.VERTICAL, 0,255,128);
+        // greenSlider.setBounds(50,350,50,100);
 
-        JButton remove = new JButton("REM");
-        remove.setBounds(100,150,100,100);
-        remove.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e){
-                blankCanvas.removeFromPermanentPalette();
-            }
-        });
+        // JSlider blueSlider = new JSlider(JSlider.VERTICAL,0,255,128);
+        // blueSlider.setBounds(100,350, 50,100);
+
+        // JButton add = new JButton("ADD");
+        // add.setBounds(0,150,100,100);
+        // add.addMouseListener(new MouseAdapter() {
+        //     @Override
+        //     public void mouseClicked(MouseEvent e){
+        //         blankCanvas.addToPermanentPalette(new Color(redSlider.getValue(), greenSlider.getValue(), blueSlider.getValue()));
+        //     }
+        // });
+
+        // JButton remove = new JButton("REM");
+        // remove.setBounds(100,150,100,100);
+        // remove.addMouseListener(new MouseAdapter() {
+        //     @Override
+        //     public void mouseClicked(MouseEvent e){
+        //         blankCanvas.removeFromPermanentPalette();
+        //     }
+        // });
 
         // JPanel colourPalette = blankCanvas.getColourPalette();
         // colourPalette.setBounds(0, 250,200,50);
@@ -231,62 +290,23 @@ public class GUI extends JFrame {
         // JPanel palette = blankCanvas.getVolatilePanel();
         // palette.setBounds(0,150,200,100);
         
-        JPanel brushSize1 = new JPanel();
-        brushSize1.setBackground(new Color(250, 0 , 0));
-        brushSize1.setBounds(0,400,50,50);
-        brushSize1.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent event){
-                System.out.println("1");
-                blankCanvas.setBrushSize(1);
-            }            
-        });
-
-        JPanel brushSize2 = new JPanel();
-        brushSize2.setBackground(new Color(200, 0 , 0));
-        brushSize2.setBounds(50,400,50,50);
-        brushSize2.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent event){
-                System.out.println("2");
-                blankCanvas.setBrushSize(2);
-            }
-        });
-
-        JPanel brushSize3 = new JPanel();
-        brushSize3.setBackground(new Color(150, 0 , 0));
-        brushSize3.setBounds(100,400,50,50);
-        brushSize3.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent event){
-                System.out.println("3");
-                blankCanvas.setBrushSize(3);
-            }            
-        });
-
-        JPanel brushSize4 = new JPanel();
-        brushSize4.setBackground(new Color(100, 0 , 0));
-        brushSize4.setBounds(150,400,50,50);
-        brushSize4.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent event){
-                blankCanvas.setBrushSize(4);
-            }            
-        });
+        RGBPanel rgbPanel = new RGBPanel(200, 350, "components/resources/RGBPanel.png");
+        JLayeredPane pane = rgbPanel.getPane();
+        pane.setBounds(0,200,200,350);
 
         // right.add(palette);
-        right.add(redSlider);
-        right.add(greenSlider);
-        right.add(blueSlider);
-        right.add(add);
-        right.add(remove);
+        right.add(miniMap);
+        // right.add(colourPalette);
+        right.add(pane);
+        // right.add(redSlider);
+        // // right.add(red);
+        // right.add(greenSlider);
+        // right.add(blueSlider);
+        // right.add(add);
+        // right.add(remove);
         // right.add(colourPalette);
         right.add(mouse);
-        right.add(brushSize1);
-        right.add(brushSize2);
-        right.add(brushSize3);
-        right.add(brushSize4);
-
+        // right.add(label);
     }
 
     private void addActionListeners(){
