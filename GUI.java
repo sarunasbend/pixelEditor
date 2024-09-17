@@ -2,8 +2,10 @@ import javax.swing.*;
 
 import components.BucketFillToolLabel;
 import components.ColourPickerToolLabel;
+import components.ColourPreview;
 import components.EditorTitle;
 import components.EraserToolLabel;
+import components.InfoPane;
 import components.PenToolLabel;
 import components.RGBButtonPane;
 import components.RGBButtonPane;
@@ -17,6 +19,7 @@ import components.ZoomInToolLabel;
 import components.ZoomOutToolLabel;
 
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -83,7 +86,7 @@ public class GUI extends JFrame {
     }
 
     private void addComponents() {
-        blankCanvas = new Canvas(canvasHeight, canvasWidth, pixelSize);
+        blankCanvas = new Canvas(canvasHeight, canvasWidth, pixelSize, "components/resources/RightBottomButtonBorder.png");
         System.out.println(pixelSize);
         JPanel canvas = blankCanvas.getCanvas();
         canvas.setLocation(canvasXPadding, canvasYPadding);
@@ -218,33 +221,46 @@ public class GUI extends JFrame {
 
     //TEMPORARY MOUSELISTENERS IN THIS CLASS
     public void addRightButtons(JPanel right){
-        JLabel mouse = blankCanvas.getMouseLabel();
-        mouse.setBounds(50, 700, 150, 100);
 
-        try {
-            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("components/resources/CustomFont.ttf"));
-            customFont = customFont.deriveFont(24f);
-            mouse.setFont(customFont);
-            mouse.setForeground(Color.YELLOW);
-        } catch (FontFormatException | IOException e){
-            e.printStackTrace();
-        }
-        
-        JPanel miniMap = new JPanel();
-        miniMap.setBackground(Color.RED);
-        miniMap.setBounds(0,0,200,200);
-                
-        RGBPanel rgbPanel = new RGBPanel(200, 350, "components/resources/RGBPanel.png");
+        ColourPreview colourPreview = new ColourPreview(200, 200, "components/resources/ColourPreview.png");
+        JLayeredPane preview = colourPreview.getPane();
+        preview.setBackground(Color.RED);
+        preview.setBounds(0,0,200,200);
+
+        RGBPanel rgbPanel = new RGBPanel(200, 350, colourPreview, "components/resources/RGBPanel.png");
         JLayeredPane pane = rgbPanel.getPane();
         pane.setBounds(0,200,200,300);
 
-        RGBButtonPane rgbButtonPanel = new RGBButtonPane(200, 75, "components/resources/ButtonPanel.png");
+        RGBButtonPane rgbButtonPanel = new RGBButtonPane(200, 75, "components/resources/RightMiddleBorder.png", colourPreview);
         JLayeredPane pane2 = rgbButtonPanel.getPane();
         pane2.setBounds(0,500,200,75);
-        right.add(miniMap);
+
+        JLayeredPane pane3 = blankCanvas.getColourPalette();
+        pane3.setBounds(0,575,200,100);
+        
+        InfoPane infoPane = new InfoPane(200, 125, "components/resources/RightInfoBorder.png", blankCanvas.getMouseLabel(), canvasWidth, canvasHeight);
+        JLayeredPane pane4 = infoPane.getPane();
+        pane4.setBounds(0,675,200,125);
+
+        right.add(preview);
         right.add(pane);
         right.add(pane2);
-        right.add(mouse);
+        right.add(pane3);
+        right.add(pane4);
+
+        rgbButtonPanel.getAddButton().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                blankCanvas.addToColourPalette(colourPreview.getPreviewColour());
+            }
+        });
+
+        rgbButtonPanel.getRemoveButton().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event){
+                blankCanvas.removeFromColourPalette(colourPreview.getPreviewColour());
+            }
+        });
     }
 
     private void addActionListeners(){

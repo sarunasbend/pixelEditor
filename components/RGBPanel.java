@@ -1,6 +1,9 @@
 package components;
 
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -27,13 +30,17 @@ public class RGBPanel {
     private Font customFont;
     private JTextField hexcode;
 
-    public RGBPanel(int width, int height, String imagePath){
+    private ColourPreview colourPreview;
+
+    public RGBPanel(int width, int height, ColourPreview colourPreview, String imagePath){
         this.width = width;
         this.height = height;
         this.imagePath = imagePath;
+        this.colourPreview = colourPreview;
         createImageIcon();
         createPane();
         createSliders();
+        addChangeListeners();
         createTextField(25, 275, 150, 25, "components/resources/CustomFont.ttf");
         createLabels();
         addToPanel();
@@ -132,5 +139,28 @@ public class RGBPanel {
     }
 
     public JLayeredPane getPane(){return this.pane;}
+
+    private void addChangeListeners(){
+        rSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent event){
+                colourPreview.setPreviewColour(getRGB());
+            }            
+        });
+
+        gSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent event){
+                colourPreview.setPreviewColour(getRGB());
+            }            
+        });
+
+        bSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent event){
+                colourPreview.setPreviewColour(getRGB());
+            }
+        });
+    }
 
 }   

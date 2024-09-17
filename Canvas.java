@@ -5,9 +5,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Stack;
-import java.awt.Graphics2D;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JLayeredPane;
+import javax.swing.ImageIcon;
+import javax.swing.BorderFactory;
 
 public class Canvas{
     public class Pixel {
@@ -43,20 +45,24 @@ public class Canvas{
 
     private JPanel canvasPanel;
     private JLabel mouseLocation;
+
+    private Color[] colourPalette; //colours that user selected using the RGB slider will be added
+    private int colourPaletteIndex = 0;
+    private JLayeredPane palettePane;
     private JPanel palettePanel;
-    private JPanel volatilePanel;
+    private JLabel[] colourLabels;
+    private JLabel foreground;
+    private String imagePath;
+    private ImageIcon imageIcon;
 
     private int canvasHeight;
     private int canvasWidth;
     private Pixel[][] pixels;
     private int pixelSize;
     private int originalPixelSize;
-    private Color currentColour = Color.BLACK;
+    private Color currentColour = Color.RED;
 
-    private Color[] permanentColourPalette; //colours that user selected using the RGB slider will be added
-    private int permanentColourIndex = 0;
-    private Color[] volatileColourPalette;  //colours that the colour picker selects, temporary colours
-    private int volatileColourIndex = 0;
+       
     private Color transparentColour = new Color(100,100,100,50);
     private int brushSize = 1; //brush sizes can either by 1, 4, 9 - determines the number of pixels coloured with one click
     private int currentCanvasMode = 0; //this is the tool currently selected, only one can be selected (with the exception of x/y mirror tools being combined)
@@ -83,13 +89,14 @@ public class Canvas{
 
     private Stack<int[]> zoomStack; //stores viewport dimensions for zoomout 
 
-    public Canvas(int height, int width, int pixelsize){
+    public Canvas(int height, int width, int pixelsize, String image){
         canvasHeight = height;
         canvasWidth = width;
         pixelSize = pixelsize;
         originalPixelSize = pixelsize; 
         viewportEndX = width;
         viewportEndY = height;
+        imagePath = image;
         pixels = new Pixel[height][width];
         undoStack = new Stack<>();
         undoStack.setSize(20);
@@ -98,9 +105,9 @@ public class Canvas{
         initPixels(); //change pixels to none null
         initPaint(); //paint component
         initCanvas(); //jpanel adjustments
-        createMouseLabel();
-        createPermanentPalette();
-        createVolatilePalette();
+        initColourPalette();
+        initMouseLabel();
+        initColourPalette();
         addMouseListener(); //mouse actions
         canvasPanel.repaint();
     }
@@ -207,12 +214,6 @@ public class Canvas{
                             break;
                         case 2: //colourpicker
                             currentColour = pixels[indexY][indexX].getPixelColour();
-                            if (volatileColourIndex < 8){
-                                volatileColourPalette[volatileColourIndex] = currentColour;
-                                volatileColourIndex++;
-                                if (volatileColourIndex == 8){volatileColourIndex = 0;}
-                                volatilePanel.repaint();
-                            }
                             break;
                         case 3: //bucketfill
                             Color replacedColour = pixels[indexY][indexX].getPixelColour();
@@ -646,7 +647,7 @@ public class Canvas{
         }
     }
 
-    public void createMouseLabel(){
+    public void initMouseLabel(){
         this.mouseLocation = new JLabel("[ 0 : 0 ]");
         this.mouseLocation.setSize(100,50);
     }
@@ -706,87 +707,71 @@ public class Canvas{
         this.currentColour = newColour;
     }
 
-    public void addToPermanentPalette(Color colour){
-        for (int i = 0; i < 16; i++){
-            if (permanentColourPalette[i] == null){
-                permanentColourPalette[i] = colour;
-                palettePanel.repaint();
-                break;
-            } else {
-                if (permanentColourPalette[i].equals(colour)){
-                    break;
-                }
-            }
-        }
-    }
+    private void initColourPalette(){
+        colourPalette = new Color[16];
+        colourLabels = new JLabel[16];
 
-    public void removeFromPermanentPalette(){
-        for (int i = 0; i < 16; i++){
-            if (permanentColourPalette[i] != null){
-               if (permanentColourPalette[i].equals(currentColour)){
-                    permanentColourPalette[i] = null;
-                    palettePanel.repaint();
-                    break;
-                } 
-            }
+        imageIcon = new ImageIcon(imagePath);
+        foreground = new JLabel(imageIcon);
+        foreground.setBounds(0,0,200,100);
         
+        palettePanel = new JPanel(null);
+        palettePanel.setBounds(0,0,200,100);
+        palettePanel.setBackground(Color.BLACK);
+
+        for (int i = 0; i < 14; i++){
+            colourLabels[i] = new JLabel();
+            colourLabels[i].setBounds(12 + (25 * (i % 7)), 25 * (i / 7), 25, 25);
+            colourLabels[i].setOpaque(true);
+            colourLabels[i].setBackground(Color.BLACK);
+            colourLabels[i].setBorder(BorderFactory.createLineBorder(Color.WHITE));
+            palettePanel.add(colourLabels[i]);
+        }
+
+        addToColourPalette(currentColour);
+
+        palettePane = new JLayeredPane();
+
+        palettePane.add(palettePanel, JLayeredPane.DEFAULT_LAYER);
+        palettePane.add(foreground, JLayeredPane.MODAL_LAYER);
+
+    }
+
+    private boolean colourExists(Color checkColour){
+        for (Color colour : colourPalette){
+            if (colour != null && colour.equals(checkColour)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void addToColourPalette(Color newColour){
+        if (!colourExists(newColour)){
+            for (int i = 0; i < 14; i++){
+                if (colourPalette[i] == null){
+                    colourPalette[i] = newColour;
+                    colourLabels[i].setBackground(newColour);
+                    colourLabels[i].repaint();
+                    i = 16;
+                }
+            }
         }
     }
 
-    private void createVolatilePalette(){
-        volatilePanel = new JPanel(null){
-            @Override
-            public void paintComponent(Graphics g){
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D)g;
-                g2d.setClip(0,0,200,25);
-                int index = 0;
-                for (int i = 0; i < 200; i+=25){
-                    g2d.setColor(volatileColourPalette[index]);
-                    g2d.drawRect(i, 0, 25, 25);
-                    g2d.fillRect(i, 0, 25, 25);
-                    index++;
+    public void removeFromColourPalette(Color oldColour){
+        if (colourExists(oldColour)){
+            for (int i = 0; i < 14; i++){
+                if (oldColour != null && colourPalette[i].equals(oldColour)){
+                    colourPalette[i] = null;
+                    colourLabels[i].setBackground(new Color(0,0,0,50));
+                    i = 14;
                 }
             }
-        };
-        volatilePanel.setSize(200,25);
+        }
     }
 
-    public JPanel getVolatilePanel(){return this.volatilePanel;}
-
-    private void createPermanentPalette(){
-        palettePanel = new JPanel(null){
-            @Override
-            public void paintComponent(Graphics g){
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D)g;
-                int index = 0;
-                for (int i = 0; i < 50; i+=25){
-                    for (int j = 0; j < 200; j+=25){
-                        if (permanentColourPalette[index] != null){
-                            g2d.setColor(permanentColourPalette[index]);
-                            g2d.drawRect(j, i, 25, 25);
-                            g2d.fillRect(j, i, 25, 25);
-                            g2d.setColor(Color.WHITE);
-                            index++;
-                        }
-                    }
-                }
-            }
-        };
-
-        palettePanel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e){
-                int x = e.getX() / 25;
-                int y = e.getY() / 25;
-                int index = (y == 0) ? x : x + 8;
-                if (permanentColourPalette[index] != null ){setCurrentColour(permanentColourPalette[index]);};
-            }
-        });
-    }
-
-    public JPanel getColourPalette(){return this.palettePanel;}
+    public JLayeredPane getColourPalette(){return this.palettePane;}
 
     //called upon deletion closure of the JFrame.
     public void deleteUndoStack(){
@@ -903,31 +888,6 @@ public class Canvas{
     }
 
     public void ZoomOut(int centerX, int centerY){
-        // if (currentZoom > 1) {
-        //     viewportHeight = Math.min(canvasHeight, viewportHeight * zoomFactor);
-        //     viewportWidth = Math.min(canvasWidth, viewportWidth * zoomFactor);
-
-        //     viewportStartY = Math.max(0, centerY - (viewportHeight / 2));
-        //     viewportStartX = Math.max(0, centerX - (viewportWidth / 2));
-
-        //     viewportEndY = Math.min(canvasHeight, centerY + (viewportHeight / 2));
-        //     viewportEndX = Math.min(canvasWidth, centerX + (viewportWidth / 2));
-
-        //     currentZoom /= zoomFactor;
-
-        //     pixelSize = Math.max(1, pixelSize / zoomFactor);
-
-        //     for (int i = viewportStartY; i < viewportEndY; i++) {
-        //         for (int j = viewportStartX; j < viewportEndX; j++) {
-        //             pixels[i][j].setGlobalPixelSize(pixelSize);
-
-        //             int newX = (j - viewportStartX) * pixelSize;
-        //             int newY = (i - viewportStartY) * pixelSize;
-        //             pixels[i][j].setLocation(newX, newY);
-        //         }
-        //     }
-        // }
-
         if (!zoomStack.isEmpty()){
             int position[] = zoomStack.pop();
             viewportStartX = position[0];

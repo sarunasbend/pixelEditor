@@ -20,12 +20,15 @@ public class RGBButtonPane {
     private JPanel panel;
     private JLabel foreGround;
 
+    private ColourPreview colourPreview;
 
-    public RGBButtonPane(int width, int height, String imagePath){
+    public RGBButtonPane(int width, int height, String imagePath, ColourPreview colourPreview){
         this.width = width;
         this.height = height;
         this.imagePath = imagePath;
+        this.colourPreview = colourPreview;
         createButtons();
+        // addActionListeners();
         createForeground();
         createPanel();
         createPane();
@@ -60,4 +63,12 @@ public class RGBButtonPane {
     }
 
     public JLayeredPane getPane(){return this.pane;}
+
+    public JButton getAddButton(){
+        return this.addButton;
+    }
+
+    public JButton getRemoveButton(){
+        return this.removeButton;
+    }
 }
