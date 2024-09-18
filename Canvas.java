@@ -3,6 +3,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Stack;
 import javax.swing.JLabel;
@@ -48,6 +49,7 @@ public class Canvas{
 
     private Color[] colourPalette; //colours that user selected using the RGB slider will be added
     private int colourPaletteIndex = 0;
+    private int previousColourIndex;
     private JLayeredPane palettePane;
     private JPanel palettePanel;
     private JLabel[] colourLabels;
@@ -529,6 +531,8 @@ public class Canvas{
         });
     }
 
+    public Color getCurrentColour(){return this.currentColour;}
+
     private void brushTwo(int y, int x, Color paintColour){
         if (x + 1 < canvasWidth){
             pixels[y][x + 1].setPixelColour(paintColour);
@@ -725,6 +729,7 @@ public class Canvas{
             colourLabels[i].setOpaque(true);
             colourLabels[i].setBackground(Color.BLACK);
             colourLabels[i].setBorder(BorderFactory.createLineBorder(Color.WHITE));
+            addMouseListener(colourLabels[i]);
             palettePanel.add(colourLabels[i]);
         }
 
@@ -735,6 +740,24 @@ public class Canvas{
         palettePane.add(palettePanel, JLayeredPane.DEFAULT_LAYER);
         palettePane.add(foreground, JLayeredPane.MODAL_LAYER);
 
+    }
+
+    private void addMouseListener(JLabel paletteLabel){
+        paletteLabel.addMouseListener(new MouseAdapter() {
+           @Override
+           public void mouseClicked(MouseEvent event ){
+                int x = (paletteLabel.getX() - 12) / 25;
+                int y = paletteLabel.getY() / 25;
+                int index = y > 0 ? x + 7 : x;
+                setSelected(index);
+            } 
+        });
+    }
+
+    private void setSelected(int index){
+        previousColourIndex = colourPaletteIndex;
+        colourPaletteIndex = index;
+        setCurrentColour(colourPalette[index]);
     }
 
     private boolean colourExists(Color checkColour){
@@ -765,6 +788,7 @@ public class Canvas{
                 if (oldColour != null && colourPalette[i].equals(oldColour)){
                     colourPalette[i] = null;
                     colourLabels[i].setBackground(new Color(0,0,0,50));
+                    currentColour = null;
                     i = 14;
                 }
             }

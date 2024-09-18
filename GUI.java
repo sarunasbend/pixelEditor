@@ -258,7 +258,7 @@ public class GUI extends JFrame {
         rgbButtonPanel.getRemoveButton().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent event){
-                blankCanvas.removeFromColourPalette(colourPreview.getPreviewColour());
+                blankCanvas.removeFromColourPalette(blankCanvas.getCurrentColour());
             }
         });
     }
