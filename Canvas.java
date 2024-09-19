@@ -63,6 +63,7 @@ public class Canvas{
     private int pixelSize;
     private int originalPixelSize;
     private Color currentColour = Color.RED;
+    private int[][][] imagePixelData;
 
        
     private Color transparentColour = new Color(100,100,100,50);
@@ -114,10 +115,41 @@ public class Canvas{
         canvasPanel.repaint();
     }
 
+    public Canvas(int height, int width, int pixelsize, String image, int[][][] imagepixelData){
+        canvasHeight = height;
+        canvasWidth = width;
+        pixelSize = pixelsize;
+        imagePath = image;
+        imagePixelData = imagepixelData;
+        viewportEndX = width;
+        viewportEndY = height;
+        pixels = new Pixel[height][width];
+        undoStack = new Stack<>();
+        undoStack.setSize(20);
+        currentAction = new ArrayList<>();
+        zoomStack = new Stack<int[]>();
+        initImagePixels(); //change pixels to none null
+        initPaint(); //paint component
+        initCanvas(); //jpanel adjustments
+        initColourPalette();
+        initMouseLabel();
+        initColourPalette();
+        addMouseListener(); //mouse actions
+        canvasPanel.repaint();
+    }
+
     private void initPixels(){
         for (int i = 0; i < canvasHeight; i++){
             for (int j = 0; j < canvasWidth; j++){
                 pixels[i][j] = new Pixel(j * pixelSize, i * pixelSize, pixelSize, Color.WHITE);
+            }
+        }
+    }
+
+    private void initImagePixels(){
+        for (int i = 0; i < canvasHeight; i++){
+            for (int j = 0; j < canvasWidth; j++){
+                pixels[i][j] = new Pixel(j * pixelSize, i * pixelSize, pixelSize, new Color(imagePixelData[i][j][0], imagePixelData[i][j][1], imagePixelData[i][j][2]));
             }
         }
     }

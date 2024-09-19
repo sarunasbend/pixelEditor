@@ -35,6 +35,7 @@ public class GUI extends JFrame {
     private int pixelSize;
     private int canvasWidth;
     private int canvasHeight;
+    private int[][][] imagePixelData;
 
     private int canvasXPadding;
     private int canvasYPadding;
@@ -76,6 +77,29 @@ public class GUI extends JFrame {
         highlightTool();
     }
 
+    public GUI(int width, int height, int canvasWidth, int canvasHeight, int[][][] imagePixelData){
+        this.width = width; //resolution of application
+        this.height = height;
+        this.canvasWidth = canvasWidth; //canvas size
+        this.canvasHeight = canvasHeight;
+        this.imagePixelData = imagePixelData;
+        //calculates the pixel size for the canvas, pixel size is smaller result from calculation
+        this.pixelSize = ((800/canvasHeight) < (800/canvasWidth)) ? (800/canvasHeight) : (800/canvasWidth); 
+        this.canvasXPadding = (800 - (pixelSize * canvasWidth)) / 2; //centers the canvas 
+        this.canvasYPadding = (800 - (pixelSize * canvasHeight)) / 2;
+
+        setForeground(Color.WHITE);
+        setLayout(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        setVisible(true); //program needs to be visible before insets are calculated
+        setSize(width, height);
+        addComponents(); //adds components
+        setInsets(); //sets the size of the JFrame to actually be width x height
+        highlightTool();
+
+    }
+
     /**
      * When creating a JFrame of n x m dimensions, it won't actually be n x m size but it will rather be the whole window tab size.
      * Insets are the width and height taken up by the OS to display the program 
@@ -86,8 +110,11 @@ public class GUI extends JFrame {
     }
 
     private void addComponents() {
-        blankCanvas = new Canvas(canvasHeight, canvasWidth, pixelSize, "components/resources/RightBottomButtonBorder.png");
-        System.out.println(pixelSize);
+        if (imagePixelData == null){
+            blankCanvas = new Canvas(canvasHeight, canvasWidth, pixelSize, "components/resources/RightBottomButtonBorder.png");
+        } else {
+            blankCanvas = new Canvas(canvasHeight, canvasWidth, pixelSize, "components/resources/RightBottomButtonBorder.png", imagePixelData);
+        }
         JPanel canvas = blankCanvas.getCanvas();
         canvas.setLocation(canvasXPadding, canvasYPadding);
 
