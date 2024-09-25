@@ -28,7 +28,6 @@ public class RGBButtonPane {
         this.imagePath = imagePath;
         this.colourPreview = colourPreview;
         createButtons();
-        // addActionListeners();
         createForeground();
         createPanel();
         createPane();

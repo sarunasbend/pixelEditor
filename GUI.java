@@ -1,10 +1,12 @@
 import javax.swing.*;
 
+import components.BrushSizePane;
 import components.BucketFillToolLabel;
 import components.ColourPickerToolLabel;
 import components.ColourPreview;
 import components.EditorTitle;
 import components.EraserToolLabel;
+import components.ExportTool;
 import components.InfoPane;
 import components.PenToolLabel;
 import components.RGBButtonPane;
@@ -52,6 +54,8 @@ public class GUI extends JFrame {
     private TrashToolLabel trashTool;
     private ZoomInToolLabel zoomInTool;
     private ZoomOutToolLabel zoomOutTool;
+
+    private JButton export;
 
     private int currentCanvasMode;
     private int previousCanvasMode = 0;
@@ -184,47 +188,28 @@ public class GUI extends JFrame {
         zoomOutTool = new ZoomOutToolLabel(100, 50, "components\\resources\\ZoomOutTool.png" , "components\\resources\\ZoomOutToolHighlight.png");
         zoomOutTool.setBounds(100,450,100,50);
 
-        JPanel brushSize1 = new JPanel();
-        brushSize1.setBackground(new Color(250, 0 , 0));
-        brushSize1.setBounds(0,150,50,50);
-        brushSize1.addMouseListener(new MouseAdapter() {
+        export = new JButton("Export");
+        export.setBounds(0,700,200,100);
+        export.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent event){
-                System.out.println("1");
-                blankCanvas.setBrushSize(1);
-            }            
-        });
-
-        JPanel brushSize2 = new JPanel();
-        brushSize2.setBackground(new Color(200, 0 , 0));
-        brushSize2.setBounds(50,150,50,50);
-        brushSize2.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent event){
-                System.out.println("2");
-                blankCanvas.setBrushSize(2);
+                ExportTool export = new ExportTool(blankCanvas.getPixelData(), canvasWidth, canvasHeight, "png");
             }
         });
 
-        JPanel brushSize3 = new JPanel();
-        brushSize3.setBackground(new Color(150, 0 , 0));
-        brushSize3.setBounds(100,150,50,50);
-        brushSize3.addMouseListener(new MouseAdapter() {
+        BrushSizePane brushSizes = new BrushSizePane(200, 75, "components\\resources\\BrushSize", "components\\resources\\BrushBorder.png");
+        JLayeredPane brushes = brushSizes.getPane();
+        brushes.setBounds(0,125,200,75);
+        
+        brushes.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent event){
-                System.out.println("3");
-                blankCanvas.setBrushSize(3);
-            }            
-        });
-
-        JPanel brushSize4 = new JPanel();
-        brushSize4.setBackground(new Color(100, 0 , 0));
-        brushSize4.setBounds(150,150,50,50);
-        brushSize4.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent event){
-                blankCanvas.setBrushSize(4);
-            }            
+                int x = event.getX() / 50;
+                if (x >= 0 && x <= 200){
+                    brushSizes.setBorder(x);
+                    blankCanvas.setBrushSize(x + 1);
+                }
+            }
         });
 
         //adds all elements to Panel
@@ -240,10 +225,8 @@ public class GUI extends JFrame {
         left.add(trashTool);
         left.add(zoomInTool);
         left.add(zoomOutTool);
-        left.add(brushSize1);
-        left.add(brushSize2);
-        left.add(brushSize3);
-        left.add(brushSize4);
+        left.add(export);
+        left.add(brushes);
     }
 
     //TEMPORARY MOUSELISTENERS IN THIS CLASS

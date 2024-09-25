@@ -963,4 +963,18 @@ public class Canvas{
         }
         canvasPanel.repaint();
     }
+
+    public int[][][] getPixelData(){
+        this.imagePixelData = new int[canvasHeight][canvasWidth][3];
+
+        for (int i = 0; i < canvasHeight; i++){
+            for (int j = 0; j < canvasWidth; j++){
+                imagePixelData[i][j][0] = pixels[i][j].getPixelColour().getRed();
+                imagePixelData[i][j][1] = pixels[i][j].getPixelColour().getGreen();
+                imagePixelData[i][j][2] = pixels[i][j].getPixelColour().getBlue();
+            }
+        }
+
+        return imagePixelData;
+    }
 }
